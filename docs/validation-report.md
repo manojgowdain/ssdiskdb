@@ -9,6 +9,7 @@ Run date: 2026-09-29. This report records the scoped package and cross-runtime v
 - Existing npm `ssdiskdb@1.1.0` still resolves and is not marked deprecated.
 - `npm view @manojgowdain/ssdiskdb` now resolves version `0.1.0`, Apache-2.0, and its tarball URL.
 - JSR metadata now resolves `@manojgowdain/ssdiskdb@0.1.0` (created 2026-09-29); `deno check jsr:@manojgowdain/ssdiskdb@0.1.0` passes.
+- The expanded repository README is the current documentation on GitHub. npm and JSR render the README snapshot from their published `0.1.0` package; a later package release is required for these README additions to appear on the registry pages.
 - The registry package metadata points at the prior `ManojGowda89` GitHub URL; this repository updates its canonical links to the user-provided `manojgowdain` URL.
 - CLI executable remains `ssdiskdb`. Package rename changes no database path, key encoding, or record format.
 
@@ -66,7 +67,7 @@ The prior larger run recorded in [`../benchmark/results.md`](../benchmark/result
 ## Behavior and remaining limits
 
 - The existing full test suite passed, including API-key handling, dashboard session auth/RBAC, namespace routing, encryption, persistence, gRPC channel reuse, TLS/mTLS, TTL, batches, scans, cache invalidation, and legacy record reads.
-- The isolated npm consumer verifies package-name resolution and packaged runtime assets. The scoped name is not yet installable from registries.
+- The isolated npm consumer verifies package-name resolution and packaged runtime assets. The scoped package is published at `0.1.0`; README changes made after that release are not included in its registry snapshot.
 - Hash and Sorted Set APIs remain the existing `hset`/`hget`/`hdel` and `zset`/`zget`/`zdel` field interfaces; no new range-ranking API is asserted.
 - The benchmark suite is reproducible but not a multi-run capacity study. Full matrix sizes/concurrency, memory ceilings under sustained load, and before/after REST-vs-gRPC comparisons were not run here.
 - Coverage reporting is not configured in this repository. There is no npm lint script; Deno formatting/lint checks cover only the source entrypoint smoke files and Deno config.

@@ -17,6 +17,10 @@ current platform limitations and validation evidence, see
 [Validation report](docs/validation-report.md). No destructive migration is
 needed for existing LevelDB databases.
 
+GitHub shows this repository version of the guide. npm and JSR display the
+README included in their published package version; their pages will show this
+expanded guide after a new package release.
+
 ## Contents
 
 - [Install](#install)
@@ -186,6 +190,19 @@ These are field/member access APIs. The current public API does not include
 can receive TTL through their `hset`/`zset` options but have no separate public
 TTL query method.
 
+```ts
+await db.incr("page:views");
+await db.incr("page:views", 4);
+
+await db.hset("user:123", "name", "Manoj");
+const name = await db.hget("user:123", "name");
+await db.hdel("user:123", "name");
+
+await db.zset("leaderboard", "user:123", 98.5);
+const score = await db.zget("leaderboard", "user:123");
+await db.zdel("leaderboard", "user:123");
+```
+
 ### Management and lifecycle methods
 
 | Method                                                        | Behavior and availability                                                                                                                                  |
@@ -210,6 +227,11 @@ entrypoint exports the named API; it does not expose the Node default export.
 Option interfaces referenced by `ConnectOptions` are accepted structurally as
 nested objects even though they are not separately re-exported from the package
 root.
+
+`parseConnectionString(uri)` parses the supported local, legacy remote, and gRPC
+URI schemes into connection options. `DatabaseCore` is the shared storage core
+used by local clients and the gRPC server; most applications should use
+`connect()` instead of constructing the core directly.
 
 ## TTL and expiration
 
@@ -612,7 +634,7 @@ bounded by `maxBatchOperations`.
 
 ### Runtime statistics
 
-`await db.stats()` returns a `StatsSnapshot`:
+`await db.stats()` returns an object with these fields:
 
 | Field                                     | Meaning                                                                                               |
 | ----------------------------------------- | ----------------------------------------------------------------------------------------------------- |
