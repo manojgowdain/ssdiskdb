@@ -1,8 +1,8 @@
 {
-  "name": "ssdiskdb",
-  "version": "1.0.2",
+  "name": "@manojgowdain/ssdiskdb",
+  "version": "0.1.0",
   "bin": {
-    "ssdiskdb": "./dist/cjs/cli.js"
+    "ssdiskdb": "dist/cjs/cli.js"
   },
   "description": "Promise-based SSDB client",
   "repository": {
@@ -14,14 +14,30 @@
   },
   "homepage": "https://github.com/ManojGowda89/ssdiskdb#readme",
   "main": "./dist/cjs/index.js",
-  "module": "./dist/index.js",
-  "types": "./dist/index.d.ts",
+  "module": "./dist/esm/index.js",
+  "types": "./dist/esm/index.d.ts",
+  "exports": {
+    ".": {
+      "import": {
+        "types": "./dist/esm/index.d.ts",
+        "default": "./dist/esm/index.js"
+      },
+      "require": {
+        "types": "./dist/cjs/index.d.ts",
+        "default": "./dist/cjs/index.js"
+      },
+      "default": "./dist/esm/index.js"
+    }
+  },
   "files": [
-    "dist"
+    "dist",
+    "proto"
   ],
   "scripts": {
-    "build": "tsc && tsc -p tsconfig.cjs.json",
-    "test": "node test.js"
+    "build": "tsc && tsc -p tsconfig.cjs.json && node scripts/write-package-markers.cjs",
+    "test": "node test.js && node test-upgrade.js",
+    "typecheck": "tsc --noEmit",
+    "benchmark": "npm run build && node benchmark/local.cjs && node benchmark/grpc.cjs && node benchmark/encryption.cjs"
   },
   "keywords": [
     "ssdb",
@@ -40,10 +56,18 @@
   ],
   "license": "Apache-2.0",
   "dependencies": {
+    "@grpc/grpc-js": "^1.14.5",
+    "@grpc/proto-loader": "^0.8.1",
     "level": "^10.0.0"
   },
   "devDependencies": {
     "@types/node": "^24.0.0",
     "typescript": "^5.9.0"
-  }
+  },
+  "directories": {
+    "doc": "docs",
+    "test": "tests"
+  },
+  "author": "",
+  "type": "commonjs"
 }

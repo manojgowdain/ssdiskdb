@@ -74,7 +74,7 @@ test("SSDiskDB Local Mode Integration Tests", async (t) => {
     const rawLocalDb = await connect("./test-local-secure-db");
     const raw = await rawLocalDb.get("confidential");
     assert.strictEqual(typeof raw, "string");
-    assert.ok(/^[0-9a-fA-F]{32}:[0-9a-fA-F]+$/.test(raw));
+    assert.ok(raw.startsWith("gcm:v1:"));
 
     await rawLocalDb.close();
 
@@ -226,9 +226,7 @@ test("SSDiskDB Local Mode Integration Tests", async (t) => {
     assert.strictEqual(resSet, 1);
 
     // Verify key was saved with namespacing in central server
-    const rawVal = await centralServer.db.get("s:client:server-a:key1");
-    assert.ok(rawVal);
-    assert.strictEqual(JSON.parse(rawVal), "val1");
+    assert.strictEqual(await centralServer.get("client:server-a:key1"), "val1");
 
     // Connect server-b client and set the same key to a different value
     const clientB = await connect({
@@ -561,10 +559,9 @@ test("SSDiskDB Local Mode Integration Tests", async (t) => {
     assert.deepStrictEqual(await client.get("secure_key"), { confidential: "remote data" });
 
     // Verify raw content on central server is encrypted
-    const rawVal = await centralServer.db.get("s:client:server-enc:secure_key");
-    assert.ok(rawVal);
+    const rawVal = await centralServer.get("client:server-enc:secure_key");
     assert.strictEqual(typeof rawVal, "string");
-    assert.ok(/^[0-9a-fA-F]{32}:[0-9a-fA-F]+$/.test(rawVal)); // Verify AES IV and ciphertext format
+    assert.ok(rawVal.startsWith("gcm:v1:")); // Verify authenticated ciphertext format
 
     // Incr operation on client-side encrypted remote
     await client.set("counter", 10);
@@ -644,7 +641,7 @@ test("SSDiskDB Local Mode Integration Tests", async (t) => {
 
     // Verify key was saved in central server namespace, NOT local server
     assert.strictEqual(await localServer.get("remote_dash_key"), undefined);
-    assert.strictEqual(await centralServer.db.get("s:client:server-y:remote_dash_key"), JSON.stringify("hello from proxy dashboard"));
+    assert.strictEqual(await centralServer.get("client:server-y:remote_dash_key"), "hello from proxy dashboard");
 
     // 4. Retrieve keys via proxy dashboard
     const resGetKeys = await fetch(`http://localhost:${dashboardPort}/api/keys`, {

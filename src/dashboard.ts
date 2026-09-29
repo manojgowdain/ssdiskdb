@@ -1,7 +1,8 @@
-import http from "http";
-import crypto from "crypto";
-import zlib from "zlib";
-import { SSDiskDBClient, connect } from "./index";
+import http from "node:http";
+import crypto from "node:crypto";
+import zlib from "node:zlib";
+import { SSDiskDBClient, connect } from "./index.ts";
+import { validateApiKey } from "./core/auth.ts";
 
 // Track client heartbeats globally/module level
 const activeHeartbeats = new Map<string, number>();
@@ -73,39 +74,6 @@ function parseKey(rawKey: string): { type: string; server: string; key: string; 
       return { type, server, key, name };
     }
   }
-}
-
-async function validateApiKey(client: SSDiskDBClient, ip: string, serverId?: string, apiKey?: string): Promise<boolean> {
-  if (!apiKey) return false;
-  const db = (client as any).db;
-  const cleanIp = ip.startsWith("::ffff:") ? ip.substring(7) : ip;
-
-  // 1. Check by serverId
-  if (serverId) {
-    try {
-      const raw = await db.get("config:server:" + serverId);
-      if (raw) {
-        const data = JSON.parse(raw);
-        if (data.status === "blocked") return false;
-        if (data.apiKey === apiKey) return true;
-      }
-    } catch (e) {}
-  }
-
-  // 2. Check by IP
-  const ipsToCheck = [cleanIp, ip];
-  for (const checkIp of ipsToCheck) {
-    try {
-      const raw = await db.get("config:server:" + checkIp);
-      if (raw) {
-        const data = JSON.parse(raw);
-        if (data.status === "blocked") return false;
-        if (data.apiKey === apiKey) return true;
-      }
-    } catch (e) {}
-  }
-
-  return false;
 }
 
 // Function to generate the HTML for the dashboard
@@ -683,15 +651,15 @@ function getDashboardHtml(username: string, role: string, mode: string = "local"
           Local Storage &amp; Self-Encryption
         </h3>
         <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 1rem;">
-          In Local Mode, SSDiskDB runs embedded directly inside your Node.js process using <strong>LevelDB</strong>. You can secure stored values on-disk transparently using AES-256-CBC encryption.
+          In Local Mode, SSDiskDB runs embedded directly inside your Node.js process using <strong>LevelDB</strong>. New encrypted values use AES-256-GCM; older AES-256-CBC records remain readable.
         </p>
         <pre style="background-color: rgba(0, 0, 0, 0.3); padding: 1rem; border-radius: 0.375rem; border: 1px solid var(--border-color); font-family: monospace; font-size: 0.85rem; color: #34d399; overflow-x: auto; margin-bottom: 0;">
-const { connect } = require("ssdiskdb");
+const { connect } = require("@manojgowdain/ssdiskdb");
 
 (async () => {
   const db = await connect({
     storagePath: "./secure-local-cache",
-    encryptionKey: "your-secret-aes-key", // Enables AES-256-CBC auto-encryption
+    encryptionKey: "your-secret-aes-key", // Enables authenticated AES-256-GCM encryption
     startDashboard: true,               // Launches this dashboard UI console
     dashboardPort: 8971
   });
@@ -714,7 +682,7 @@ const { connect } = require("ssdiskdb");
           When whitelisted, remote client servers can establish connection to this central cache. Connection performs a handshake check immediately at startup. Keys are isolated in a server-specific namespace (e.g. <code>s:client:server-a:key</code>).
         </p>
         <pre style="background-color: rgba(0, 0, 0, 0.3); padding: 1rem; border-radius: 0.375rem; border: 1px solid var(--border-color); font-family: monospace; font-size: 0.85rem; color: #34d399; overflow-x: auto; margin-bottom: 1rem;">
-const { connect } = require("ssdiskdb");
+const { connect } = require("@manojgowdain/ssdiskdb");
 
 (async () => {
   // Remote client connection
@@ -2658,8 +2626,24 @@ export function startDashboardServer(
 
             // Apply prefix namespacing if serverId is present and is not 'Local'
             if (serverId && serverId !== "Local") {
-              if (["set", "get", "del", "exists", "incr"].includes(action)) {
+              if (["set", "get", "del", "exists", "incr", "expire", "ttl", "persist"].includes(action)) {
                 args[0] = `client:${serverId}:${args[0]}`;
+              } else if (action === "mget" || action === "mdelete") {
+                args[0] = args[0].map((key: string) => `client:${serverId}:${key}`);
+              } else if (action === "mset") {
+                args[0] = args[0].map((entry: any) => Array.isArray(entry)
+                  ? [`client:${serverId}:${entry[0]}`, ...entry.slice(1)]
+                  : { ...entry, key: `client:${serverId}:${entry.key}` });
+              } else if (action === "batch") {
+                args[0] = args[0].map((operation: any) => ({
+                  ...operation,
+                  key: `client:${serverId}:${operation.key}`
+                }));
+              } else if (action === "scan") {
+                const options = args[0] || {};
+                options.prefix = `client:${serverId}:${options.prefix || ""}`;
+                options.cursor = options.cursor || undefined;
+                args[0] = options;
               } else if (["hset", "hget", "hdel"].includes(action)) {
                 args[0] = `client:${serverId}:${args[0]}`;
               } else if (["zset", "zget", "zdel"].includes(action)) {
@@ -2707,7 +2691,17 @@ export function startDashboardServer(
             }
 
             if (typeof (client as any)[action] === "function") {
-              const result = await (client as any)[action](...args);
+              let result = await (client as any)[action](...args);
+              if (serverId && serverId !== "Local" && action === "scan") {
+                const namespacePrefix = `client:${serverId}:`;
+                result = {
+                  ...result,
+                  entries: result.entries.map((entry: any) => ({
+                    ...entry,
+                    key: entry.key.startsWith(namespacePrefix) ? entry.key.substring(namespacePrefix.length) : entry.key
+                  }))
+                };
+              }
               res.writeHead(200, { "Content-Type": "application/json" });
               res.end(JSON.stringify({ result }));
             } else {
@@ -3150,3 +3144,4 @@ export function startDashboardServer(
     server.on("error", reject);
   });
 }
+import { Buffer } from "node:buffer";

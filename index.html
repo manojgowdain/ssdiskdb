@@ -451,7 +451,7 @@
       <p>A high-performance, <strong>open-source</strong>, embedded NoSQL database and key-value store <strong>built specifically for the JavaScript &amp; Node.js community</strong>, powered by Google's LevelDB.</p>
       
       <div class="badge-container">
-        <a class="badge" href="https://www.npmjs.com/package/ssdiskdb" target="_blank">NPM Package v1.0.2</a>
+        <a class="badge" href="https://www.npmjs.com/package/ssdiskdb" target="_blank">Legacy NPM Package: ssdiskdb</a>
         <a class="badge" href="https://github.com/google/leveldb" target="_blank">Google LevelDB Engine</a>
         <a class="badge" href="https://github.com/ManojGowda89/ssdiskdb" target="_blank">GitHub Repository</a>
         <a class="badge" href="https://hub.docker.com/r/manoj20002/ssdiskdb" target="_blank">Docker Hub Image</a>
@@ -557,7 +557,8 @@
       <p>Install inside your Node.js application:</p>
       <div class="code-block-wrapper">
         <button class="btn-copy" onclick="copyCode(this)">Copy</button>
-        <pre><code>npm install ssdiskdb</code></pre>
+        <pre><code>npm install @manojgowdain/ssdiskdb</code></pre>
+      <p>The package is being renamed from <code>ssdiskdb</code>. The old package remains available; the scoped package will be available after its first publication.</p>
       </div>
 
       <h3>Method 2: One-Command Shell Installer (macOS & Linux)</h3>
@@ -587,7 +588,7 @@
       <p>Connect natively to a LevelDB instance inside your Node application:</p>
       <div class="code-block-wrapper">
         <button class="btn-copy" onclick="copyCode(this)">Copy</button>
-        <pre><code>const { connect } = require("ssdiskdb");
+        <pre><code>const { connect } = require("@manojgowdain/ssdiskdb");
 
 (async () => {
   const db = await connect({
@@ -772,7 +773,7 @@ await db.zdel("highscores", "alex");</code></pre>
         <li class="ref-item">
           <svg class="ref-icon" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M13.19 8.688a4.5 4.5 0 011.242 7.244l-4.5 4.5a4.5 4.5 0 01-6.364-6.364l1.757-1.757m13.35-.622l1.757-1.757a4.5 4.5 0 00-6.364-6.364l-4.5 4.5a4.5 4.5 0 001.242 7.244" /></svg>
           <div>
-            <a href="https://www.npmjs.com/package/ssdiskdb" target="_blank">SSDiskDB NPM Package</a> - The official NPM package module for integration in Node.js applications.
+            <a href="https://www.npmjs.com/package/ssdiskdb" target="_blank">Legacy SSDiskDB NPM Package (ssdiskdb)</a> - The previous unscoped package name.
           </div>
         </li>
         <li class="ref-item">

@@ -1,0 +1,25 @@
+{
+  "name": "@manojgowdain/ssdiskdb",
+  "version": "0.1.0",
+  "license": "Apache-2.0",
+  "exports": "./mod.ts",
+  "publish": {
+    "include": [
+      "LICENSE",
+      "README.md",
+      "mod.ts",
+      "src/**/*.ts",
+      "proto/ssdiskdb.proto"
+    ]
+  },
+  "imports": {
+    "@grpc/grpc-js": "npm:@grpc/grpc-js@^1.14.5",
+    "@grpc/proto-loader": "npm:@grpc/proto-loader@^0.8.1",
+    "level": "npm:level@^10.0.0"
+  },
+  "nodeModulesDir": "auto",
+  "compilerOptions": {
+    "strict": true,
+    "types": ["npm:@types/node@^24.0.0"]
+  }
+}

@@ -1,7 +1,7 @@
 #!/usr/bin/env node
-import { connect } from "./index";
-import crypto from "crypto";
-import readline from "readline";
+import { connect } from "./index.ts";
+import crypto from "node:crypto";
+import readline from "node:readline";
 
 function printHelp() {
   console.log(`
@@ -15,13 +15,18 @@ Commands:
   credentials     Updates the admin username and password stored in the database
   server          Manages allowed servers list (VPC access control)
   subaccount      Manages sub-accounts (junior / senior developers) for the dashboard
+  ttl             Reads a key's remaining TTL in milliseconds
+  expire          Sets a key's TTL in milliseconds
+  persist         Removes a key's expiration
 
 Options for 'start':
   --port <port>     Port to run the dashboard on (default: 8971)
   --path <path>     Path to the LevelDB database folder (default: ./ssdb-local-db)
   --remote <url>    Connect as a remote client to the specified central server URL
+  --grpc <target>   Connect to the gRPC server at host:port (primary remote transport)
   --apiKey <key>    API key for remote client connection
   --serverId <id>   Server ID for remote client connection
+  --grpc-port <n>   Local gRPC server port (default: 8972)
 
 Options for 'credentials':
   --username <un>  New admin username (required)
@@ -43,6 +48,7 @@ Options for 'subaccount':
 Examples:
   npx ssdiskdb start --port 8971
   npx ssdiskdb start --remote http://localhost:8971 --apiKey mykey --serverId client-a
+  npx ssdiskdb start --grpc localhost:8972 --apiKey mykey --serverId client-a
   npx ssdiskdb credentials --username admin --password secret
   npx ssdiskdb server add 10.0.0.5 my_custom_key
   npx ssdiskdb server list
@@ -87,7 +93,7 @@ async function main() {
   if (command === "start") {
     let connectionUri = getFlagValue("--uri");
     if (!connectionUri) {
-      const positional = args.find(a => a.startsWith("ssdiskdb://") || a.startsWith("ssdiskdb+encry://"));
+      const positional = args.find(a => a.startsWith("ssdiskdb://") || a.startsWith("ssdiskdb+encry://") || a.startsWith("ssdiskdb+grpc://") || a.startsWith("ssdiskdb+grpc+encry://"));
       if (positional) {
         connectionUri = positional;
       }
@@ -122,10 +128,31 @@ async function main() {
       }
     } else {
       const remoteUrl = getFlagValue("--remote") || getFlagValue("--remoteUrl");
+      const grpcTarget = getFlagValue("--grpc");
       const apiKey = getFlagValue("--apiKey") || getFlagValue("--api-key");
       const serverId = getFlagValue("--serverId") || getFlagValue("--server-id");
 
-      if (remoteUrl) {
+      if (grpcTarget) {
+        if (!apiKey || !serverId) {
+          console.error("Error: Both --apiKey and --serverId are required for gRPC client connection.");
+          process.exit(1);
+        }
+        console.log(`Connecting to gRPC SSDiskDB server at ${grpcTarget}...`);
+        try {
+          const client = await connect({ grpcTarget, apiKey, serverId });
+          console.log(`Connected successfully over gRPC.`);
+          console.log(`Server ID: ${serverId}`);
+          console.log(`Press Ctrl+C to disconnect...`);
+          process.on("SIGINT", async () => {
+            console.log("\nDisconnecting...");
+            await client.close();
+            process.exit(0);
+          });
+        } catch (err: any) {
+          console.error("Failed to connect to gRPC server:", err.message);
+          process.exit(1);
+        }
+      } else if (remoteUrl) {
         if (!apiKey || !serverId) {
           console.error("Error: Both --apiKey and --serverId are required for remote client connection.");
           process.exit(1);
@@ -169,8 +196,15 @@ async function main() {
             dashboardPort: port
           });
 
+          const grpcPort = parseInt(getFlagValue("--grpc-port") || "8972", 10);
+          if (isNaN(grpcPort) || grpcPort < 0 || grpcPort > 65535) {
+            throw new Error("Invalid gRPC port specified");
+          }
+          const grpcAddress = await client.startGrpcServer({ host: "0.0.0.0", port: grpcPort });
+
           console.log(`SSDiskDB Local Engine started successfully.`);
           console.log(`Dashboard is running at: http://localhost:${port}`);
+          console.log(`gRPC server is listening at: ${grpcAddress}`);
           console.log(`Default credentials: manoj / manoj (Use credentials command to change)`);
           console.log(`Press Ctrl+C to terminate...`);
 
@@ -185,6 +219,26 @@ async function main() {
           process.exit(1);
         }
       }
+    }
+  } else if (["ttl", "expire", "persist"].includes(command)) {
+    const key = args[1];
+    if (!key || (command === "expire" && args[2] === undefined)) {
+      console.error(`Error: Usage is ttl <key>, expire <key> <milliseconds>, or persist <key>.`);
+      process.exit(1);
+    }
+    try {
+      const client = await connect({ storagePath: dbPath });
+      if (command === "ttl") console.log(await client.ttl(key));
+      else if (command === "persist") console.log(await client.persist(key));
+      else {
+        const ttl = Number(args[2]);
+        if (!Number.isFinite(ttl) || ttl < 0) throw new Error("TTL must be a non-negative number of milliseconds");
+        console.log(await client.expire(key, ttl));
+      }
+      await client.close();
+    } catch (err: any) {
+      console.error("TTL operation failed:", err.message);
+      process.exit(1);
     }
   } else if (command === "credentials") {
     const username = getFlagValue("--username");

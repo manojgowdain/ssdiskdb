@@ -4,9 +4,10 @@
     "module": "ESNext",
     "moduleResolution": "Node",
     "declaration": true,
-    "outDir": "./dist",
+    "outDir": "./dist/esm",
     "rootDir": "./src",
     "strict": true,
+    "rewriteRelativeImportExtensions": true,
     "esModuleInterop": true,
     "skipLibCheck": true
   },

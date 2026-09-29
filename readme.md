@@ -1,290 +1,185 @@
 # SSDiskDB
 
-[![NPM Version](https://img.shields.io/npm/v/ssdiskdb.svg)](https://www.npmjs.com/package/ssdiskdb)
-[![License](https://img.shields.io/npm/l/ssdiskdb.svg)](https://github.com/ManojGowda89/ssdiskdb/blob/main/LICENSE)
-[![GitHub Repository](https://img.shields.io/badge/GitHub-ManojGowda89%2Fssdiskdb-blue?logo=github)](https://github.com/ManojGowda89/ssdiskdb)
-[![LevelDB](https://img.shields.io/badge/Database-Google%20LevelDB-blue?logo=google)](https://github.com/google/leveldb)
-[![Docker Hub](https://img.shields.io/badge/Docker%20Hub-manoj20002%2Fssdiskdb-blue?logo=docker)](https://hub.docker.com/r/manoj20002/ssdiskdb)
-[![Inspired by SSDB](https://img.shields.io/badge/Inspired%20by-SSDB-brightgreen?logo=database)](https://github.com/ideawu/ssdb)
+SSDiskDB is an embedded, disk-backed key-value database for Node.js. It stores records in LevelDB and provides String, Hash, and Sorted Set APIs, persistent expiration, batching, cursor scans, an optional bounded cache, a browser dashboard, and a gRPC remote interface.
 
-**SSDiskDB** is a high-performance, **open-source, embedded NoSQL database and key-value store built specifically for the JavaScript & Node.js community**, designed as a cost-effective, disk-backed alternative to Redis. It is built directly on top of [Google's LevelDB](https://github.com/google/leveldb) storage engine.
+## Install
 
-It is **not** a wrapper or client for the C++ SSDB database server; rather, it is a standalone, lightweight database library built from scratch in TypeScript by [Manoj Gowda](https://manojgowda.in) that brings Redis-like APIs (Strings, Hashes, Sorted Sets) directly to LevelDB. It is inspired by the design principles of SSDB and its production adoption by industry pioneers like Zerodha.
-
----
-
-## 💡 Motivation & Inspiration (Inspired by SSDB & Zerodha)
-
-The creation of **SSDiskDB** is inspired by **SSDB** and tech-industry pioneers like **Zerodha** (India's largest stock broker), who document their use of disk-backed databases in their [Zerodha Tech Stack](https://zerodha.tech/stack/).
-
-### How the Author Discovered Disk-Backed Caching from Zerodha
-
-During research into cost-efficient, high-volume caching architectures, the project's creator, [Manoj Gowda](https://manojgowda.in), came across the public engineering disclosures of **Zerodha** (India's premier high-frequency stock brokerage). In their technical stack documentations published on [zerodha.tech](https://zerodha.tech), Zerodha's engineering team detailed how they self-host **SSDB** (an open-source, disk-backed NoSQL database utilizing Google's LevelDB engine under the hood) as a key-value cache.
-
-In massive production environments, storing billions of keys in memory-only databases like Redis becomes prohibitively expensive due to RAM costs. By reading Zerodha's technical posts, [Manoj](https://manojgowda.in) learned how they leveraged SSDB to write records directly to SSDs while keeping a highly optimized memory cache for hot data. This hybrid architecture allowed them to achieve near-Redis latencies at a fraction of the cost, saving massive amounts of RAM and scaling cost-effectively.
-
-This discovery inspired [Manoj](https://manojgowda.in) to build **SSDiskDB** from scratch specifically for the JavaScript & Node.js community. Instead of running a separate C++ SSDB daemon process, **SSDiskDB** implements these identical design principles inside an embedded Node.js library—bundling Google's LevelDB storage engine with a Redis-like API, connection pooling, security access whitelisting, and secure remote proxies.
-
----
-
-## ⚡ Key Features
-
-- ⚡ **Modern Promise-Based API**: Fully compatible with `async/await` syntax.
-- 🔌 **Built-in Connection Pooling**: Manages HTTP/JSON-RPC sockets dynamically.
-- 📦 **Automatic JSON Serialization**: Save and load objects, arrays, numbers, and booleans without manually calling `JSON.stringify` or `JSON.parse`.
-- 🔒 **Client-Side AES-256-CBC Encryption**: Transparently encrypt values on write and decrypt on read. The central database only sees/stores ciphertext, ensuring zero-knowledge privacy in the cloud.
-- 🔄 **Legacy Backward Compatibility**: Auto-detects and reads unencrypted legacy values safely without crashing or failing.
-- 👥 **Dual-Mode Glassmorphic Dashboard**: A premium, responsive visual interface acting as either a Local Database Console or a Secure Remote Proxy to manage cloud servers.
-- 🔑 **Allowed Server Whitelisting**: Lock down access using whitelisted server IDs, dynamic IPs, and reissuable API keys.
-- 👥 **Role-Based Access Control (RBAC)**: Support for Read/Write Admins, Senior Developers, and Read-Only Junior accounts.
-- 📘 **TypeScript Native**: Complete type safety and IDE autocomplete.
-- 📦 **Dual ESM & CommonJS**: Ready for both modern and legacy runtime environments.
-
----
-
-## ⚔️ Redis vs. SSDiskDB
-
-| Feature | Redis | SSDiskDB |
-| :--- | :--- | :--- |
-| **Storage Medium** | Primarily RAM (In-Memory) | Disk-backed (using LevelDB Log-Structured Merge Tree) |
-| **Data Capacity** | Constrained by available system RAM | Constrained by disk capacity (up to terabytes/petabytes) |
-| **Operational Cost** | High (RAM is expensive at scale) | 10x to 100x Lower (SSD/Disk storage is cheap) |
-| **Implementation** | C | TypeScript / Node.js (via LevelDB bindings) |
-| **Data Structures** | Strings, Hashes, Lists, Sets, Sorted Sets, etc. | Strings, Hashes, Sorted Sets |
-| **Encryption** | Transport Encryption (TLS) | Transport TLS + Client-Side Envelope Encryption (AES-256-CBC) |
-| **Hosting Mode** | Standalone TCP Service | Local Embedded Library OR Client-Server REST Console |
-
-### How SSDiskDB builds on top of LevelDB:
-Google's LevelDB is a simple raw byte-stream key-value store. It has no built-in networking, server authorization, hashes, sorted sets, or encryption. 
-SSDiskDB creates these structures on top of LevelDB:
-1. **Data Types**: Implements prefix mappings (e.g. `s:key` for Strings, `h:name:key` for Hashes, and `z:name:key` for Sorted Sets) to map multi-dimensional structures into a single flat LevelDB keyspace.
-2. **Dashboard & RPC**: Adds a secure HTTP JSON-RPC endpoint `/api/rpc` to allow remote nodes to request operations.
-3. **Envelope Encryption**: Serializes data to JSON and encrypts it locally before sending it to LevelDB or over the wire, protecting the host disk from data leaks.
-
----
-
-## 🛠️ Installation & Deployment
-
-You can install and run SSDiskDB using three different methods depending on your environment:
-
-### Method 1: Global/Local NPM Package
-Install locally inside your Node.js application:
 ```bash
-npm install ssdiskdb
+npm install @manojgowdain/ssdiskdb
 ```
-Or install globally to gain direct command line interface (CLI) database operations:
+
+## Local use
+
+```ts
+import { connect } from "@manojgowdain/ssdiskdb";
+
+const db = await connect();
+await db.set("name", "Manoj");
+console.log(await db.get("name"));
+await db.close();
+```
+
+`connect()` opens `./ssdb-local-db` by default. Existing `connect(path)` calls and the existing String, Hash, Sorted Set, dashboard, and CLI APIs remain available. The local process owns LevelDB; remote clients connect to that process.
+
+Values are JSON serialized by default. Node `Buffer` values are stored and returned as binary. Existing unframed LevelDB JSON records remain readable.
+
+## TTL
+
+TTL is expressed in milliseconds and stored with the primary record. `set`, `hset`, and `zset` accept `{ ttl }`. `expire(key, ttl)` sets/replaces expiry and `persist(key)` removes it. Expired records act as absent records. `ttl(key)` returns `-2` for missing/expired, `-1` for no expiry, or the non-negative remaining milliseconds.
+
+```ts
+await db.set("session", { userId: 123 }, { ttl: 60_000 });
+console.log(await db.ttl("session"));
+await db.expire("session", 30_000);
+await db.persist("session");
+```
+
+Expiration is restart-safe. A single unref'ed cleanup worker walks the ordered `ttl/<expiresAt>/<dataKey>` index in bounded batches; reads also lazily delete expired records. Old records without TTL metadata never expire. Configure it with `ttl: { cleanupInterval: 1000, cleanupBatchSize: 500 }`.
+
+## Bulk operations and scans
+
+```ts
+await db.mset([["user:1", user1], ["user:2", user2]]);
+const users = await db.mget(["user:1", "user:2"]);
+await db.mdelete(["user:1", "user:2"]);
+await db.batch([
+  { type: "set", key: "a", value: 1 },
+  { type: "set", key: "b", value: 2, ttl: 60_000 },
+  { type: "delete", key: "c" }
+]);
+
+const page = await db.scan({ prefix: "user:", limit: 100 });
+const nextPage = await db.scan({ prefix: "user:", limit: 100, cursor: page.cursor });
+for await (const entry of db.streamScan({ prefix: "user:", limit: 100 })) {
+  // consume one entry at a time
+}
+```
+
+`mget` uses Level's multi-read API; writes/deletes use LevelDB batches. Scans use ordered LevelDB iterators and opaque cursor pagination. `batch()` currently supports String set/delete operations.
+
+## gRPC remote access
+
+The primary remote database protocol is gRPC over HTTP/2 using Protocol Buffers. The dashboard's browser/admin HTTP interface and the legacy REST/JSON-RPC route remain for compatibility; new application clients should use gRPC.
+
+Start a local database and gRPC listener:
+
 ```bash
-npm install -g ssdiskdb
+npx ssdiskdb start --path ./data --port 8971 --grpc-port 8972
 ```
 
-### Method 2: One-Command Shell Installer (macOS & Linux)
-To run the database server and get instant global command access without manually setting up dependencies, run this single command from your terminal. It will auto-detect/install Node.js if missing, globally install the database, and configure shell path aliases:
+Register a client to get an API key, then connect:
+
 ```bash
-curl -fsSL https://raw.githubusercontent.com/ManojGowda89/ssdiskdb/main/install.sh | bash
+npx ssdiskdb server add app-server --path ./data
 ```
 
-### Method 3: Cloud Docker Container
-We provide a lightweight, pre-built Docker image hosted on Docker Hub, as well as a multi-stage `Dockerfile` to build from source.
-
-#### Option A: Pull and Run pre-built Image from Docker Hub
-To run the container directly (using persistent volume mount to `/data`):
-```bash
-docker run -d \
-  -p 8971:8971 \
-  -v ssdb-data-volume:/data \
-  --name ssdiskdb-server \
-  manoj20002/ssdiskdb:latest
+```ts
+const remote = await connect("ssdiskdb+grpc://API_KEY@localhost:8972/app-server");
+await remote.set("name", "Manoj");
+console.log(await remote.get("name"));
+await remote.close();
 ```
 
-#### Option B: Build and Run from Source
-1. **Build the Docker Image:**
-```bash
-docker build -t ssdiskdb .
-```
+Encrypted client-side values use `ssdiskdb+grpc+encry://API_KEY@HOST:PORT/SERVER_ID?key=SECRET`. The encryption key is client supplied and is never sent as authentication metadata. The prior `ssdiskdb://` and `ssdiskdb+encry://` HTTP URI schemes remain accepted for older deployments; they do not implicitly switch to gRPC.
 
-2. **Run the Container (with Volume Mount for Persistence):**
-```bash
-docker run -d \
-  -p 8971:8971 \
-  -v ssdb-data-volume:/data \
-  --name ssdiskdb-server \
-  ssdiskdb
-```
+One persistent gRPC channel is reused per client. Requests have configurable deadlines and message limits. Batch methods are one RPC and one logical LevelDB batch. Streaming scan yields entries incrementally. The server checks the Bearer API key and server ID on every RPC and scopes operations to that server's namespace.
 
-*Docker deployment details:*
-- **Port Mapping**: Map port `8971` to access the Insights Dashboard (e.g. `http://localhost:8971`).
-- **Volume persistence**: The database is stored inside `/data` in the container. The `-v ssdb-data-volume:/data` flag ensures data is saved securely on host storage.
-- **Volume Recommendation**: It is highly recommended to mount a persistent volume (`-v`) to prevent data loss when the container restarts or is rebuilt.
+### TLS
 
----
+For production, configure server `privateKey` and `certChain` (and `rootCert` plus `requireClientCertificate` for mutual TLS) in `GrpcServerOptions`. Configure client `grpcTls: { rootCert, serverName }`; mTLS clients also provide `privateKey` and `certChain`. Without TLS, gRPC uses insecure transport, suitable only for trusted local networks. TLS protects the channel; application-level encryption is separate.
 
-## 🚀 Connection Options
+The `.proto` schema is in `proto/ssdiskdb.proto`. It exposes handshake, String CRUD, TTL, batch, Hash, Sorted Set, scan/stream scan, stats, flush, and key listing operations.
 
-SSDiskDB can operate as a purely local cache inside your application, or as a central cache server shared across multiple remote client servers (VPC environment).
+## API keys and dashboard
 
-### 1. Local Mode Connection (Quick Start)
-Stores data in the default folder `./ssdb-local-db`:
-```js
-const { connect } = require("ssdiskdb");
+The existing CLI server registration and API-key configuration are retained. The gRPC server validates the key and registered server ID before database operations. Data operations run inside that server's namespace. Existing dashboard login, server/client management, and RBAC remain in the dashboard HTTP layer. Do not expose an insecure listener to an untrusted network; configure TLS and restrict network access.
 
-(async () => {
-  const db = await connect();
-  await db.set("name", "Manoj");
-  console.log(await db.get("name")); // Manoj
-  await db.close();
-})();
-```
+Start dashboard only with `npx ssdiskdb start --port 8971`. Existing CLI commands remain, with `ttl <key>`, `expire <key> <milliseconds>`, and `persist <key>` added for local database administration.
 
-To configure custom path, encryption (AES-256-CBC), or start the dashboard server:
-```js
+## Encryption and stored format
+
+Client-side encryption uses AES-256-GCM with an authentication tag for new encrypted values. Older AES-256-CBC ciphertext is still readable. GCM ciphertext tampering is rejected. Keep encryption keys outside the database and source tree. Encryption is not a replacement for TLS.
+
+New records use a compact envelope containing record flags, optional absolute expiration time, and payload. JSON and binary payloads are distinguished. Old JSON records without the envelope are decoded as non-expiring legacy records. TTL index rows are separate LevelDB keys and are removed atomically with normal replacement/deletion and by bounded cleanup. No destructive database migration is performed.
+
+## Performance options
+
+```ts
 const db = await connect({
-  storagePath: "./my-custom-data-dir",
-  encryptionKey: "my-secure-key",
-  startDashboard: true,
-  dashboardPort: 8971
+  ttl: { cleanupInterval: 1000, cleanupBatchSize: 500 },
+  cache: { enabled: true, maxEntries: 10_000, ttl: 30_000 }
 });
 ```
 
-### 2. Connection URIs (Single String Config & Client-Side Encryption)
-For simplified configuration, you can connect using a single URI containing the credentials, host, and server ID.
+The cache is disabled by default and bounded when enabled. Writes, deletes, expiry changes, flush, and namespace flush invalidate affected entries; TTL is checked before returning cached data. `db.stats()` returns lightweight operation/cache/TTL counters. Cache performance depends on workload and should be measured before enabling it.
 
-**Standard (Plaintext) URI:**
-```js
-const db = await connect("ssdiskdb://ssdb_c4dee067d4a23dd35da3270ddd5b2cc5@<central-server-ip>:8971/server-a");
+Run `npm run benchmark` for local, loopback gRPC, and encryption payload-size benchmarks. Run scripts directly to set sample counts, for example `node benchmark/local.cjs 10000`, `node benchmark/grpc.cjs 5000`, or `node benchmark/encryption.cjs 100`. They warm the database where applicable, exclude initialization from measured request latency, and report throughput, p50/p95/p99 latency, RSS delta, and process CPU time. The recorded baseline and post-change measurements are in [`benchmark/results.md`](benchmark/results.md); they show a local SET/GET regression and material encryption overhead for large values, so no general local speedup is claimed. Results depend on hardware, filesystem, Node.js version, and LevelDB compaction state; do not compare runs across unlike environments.
+
+## Architecture
+
+```text
+Application
+      │
+      ├──────── Local API
+      │
+      └──────── gRPC / HTTP2
+                    │
+                    ▼
+              Database Core
+                    │
+        ┌───────────┼───────────┐
+        │           │           │
+      Cache     TTL Engine   Batch Engine
+        │           │           │
+        └───────────┼───────────┘
+                    │
+                Record Codec
+                    │
+                  LevelDB
 ```
 
-**Encrypted URI (with Client-Side AES-256-CBC Envelope Encryption):**
-Secure data transparently *before* it leaves your client server. Only the client has the encryption key; the central server only sees and stores ciphertext, providing full data privacy.
-```js
-const db = await connect("ssdiskdb+encry://ssdb_c4dee067d4a23dd35da3270ddd5b2cc5@<central-server-ip>:8971/server-a?key=your-secret-aes-key");
-```
+The local API and gRPC server call the same `DatabaseCore`. The server process is the only owner of its LevelDB instance; remote clients send operations over a persistent channel.
 
-> [!IMPORTANT]
-> **Startup Handshake**: During `connect()`, a remote client performs an immediate validation handshake with the central server. If the API Key is invalid, the server is blocked/restricted, or the endpoint is unreachable, `connect()` fails early throwing a descriptive error.
-> 
-> **Data Isolation**: The central server automatically isolates database operations. Client-set keys are prefixed behind the scenes (e.g. `s:client:server-a:mykey`). Operations like `flush()` or `getAllKeys()` are sandboxed to only affect the client's own namespace.
+## Migration
 
----
+New remote clients should migrate from `ssdiskdb://` REST/JSON-RPC URIs to `ssdiskdb+grpc://` gRPC URIs and enable TLS when crossing a trusted network boundary. The legacy HTTP endpoints and URI parsing are retained for compatibility. Local method names and existing exports remain; old LevelDB records are readable and no destructive key rewrite occurs. New GCM ciphertext can be read by upgraded versions; older package versions that only understand CBC cannot decrypt it, so upgrade all encrypted clients and servers together.
 
-## 🖥️ Web Insights Dashboard & CLI
-
-SSDiskDB comes equipped with a built-in web console similar to Redis Insights. It operates on port `8971` by default and allows you to view database statistics, search keys, add/edit cache entries, delete records, clear the database, and manage allowed client connections.
-
-### Dual-Mode Dashboard UI (Local & Remote Proxying)
-The dashboard features a premium glassmorphic dual-mode login console:
-- **Local Database Mode**: Login with your admin or sub-account credentials to manage the local embedded LevelDB engine.
-- **Remote Connection Mode**: Login using a connection URI (`ssdiskdb://...` or `ssdiskdb+encry://...`). When connected in Remote Mode, the dashboard serves as a secure reverse-proxy console. All keys, metrics, and CRUD operations are dynamically forwarded to the central server, while restricting access to local-only admin configurations (like allowed servers or sub-accounts).
-
----
-
-## ☁️ Cloud Deployment & Secure Local-to-Cloud Setup
-
-In a production environment, running an administrative dashboard directly exposed on the public internet is a major security risk. SSDiskDB solves this by allowing you to run the server headlessly on the cloud, and securely proxy data to your local workstation.
-
-```mermaid
-sequenceDiagram
-    participant Local Workstation
-    participant Local Dashboard (Port 8971)
-    participant Cloud Central Server (Port 8971)
-    
-    Local Workstation->>Local Dashboard (Port 8971): Open http://localhost:8971 in browser
-    Local Workstation->>Local Dashboard (Port 8971): Enter Remote Connection URI (ssdiskdb://...)
-    Local Dashboard (Port 8971)->>Cloud Central Server (Port 8971): Handshake & Verify API Key
-    Cloud Central Server (Port 8971)-->>Local Dashboard (Port 8971): Handshake Verified (Session Created)
-    Local Dashboard (Port 8971)->>Cloud Central Server (Port 8971): Forward Data RPCs (Fetch/Add/Delete Keys)
-    Cloud Central Server (Port 8971)-->>Local Dashboard (Port 8971): Returns Namespaced Sandbox Results
-```
-
-### Complete Walkthrough: Setting up Local Dashboard for Cloud Data
-
-#### Step 1: Deploy SSDiskDB on your Cloud Server
-Deploy the database container on your cloud VPS (e.g., AWS EC2 instance, DigitalOcean Droplet, GCP VM):
-```bash
-docker run -d \
-  -p 8971:8971 \
-  -v /var/lib/ssdb:/data \
-  --name ssdiskdb-prod \
-  manoj20002/ssdiskdb:latest
-```
-
-#### Step 2: Register a Console client
-SSH into your cloud server and register an allowed connection for your local dashboard. This creates a secure, sandboxed client profile:
-```bash
-docker exec -it ssdiskdb-prod node dist/cjs/cli.js server add local-dev-console
-```
-This prints a unique API Key. For example:
-`Registered local-dev-console with API Key: ssdb_c4dee067d4a23dd35da3270ddd5b2cc5`
-
-#### Step 3: Copy the Connection URI
-On your cloud server, copy the pre-formed connection URI. It follows this structure:
-```
-ssdiskdb://ssdb_c4dee067d4a23dd35da3270ddd5b2cc5@<your-cloud-ip>:8971/local-dev-console
-```
-
-#### Step 4: Open your Local Dashboard to Connect
-1. On your local developer machine, start a local dashboard:
-   ```bash
-   npx ssdiskdb start --port 8971
-   ```
-2. Open `http://localhost:8971` in your web browser.
-3. On the login screen, click the **Remote Connection** tab.
-4. Paste the connection URI from Step 3 and click **Sign In**.
-5. **Success!** Your local dashboard is now acting as a secure reverse-proxy console. You can view, search, and edit database records directly on the cloud server from your local machine, without exposing any management screens to the public web.
-
----
-
-## 🛠️ CLI Reference
-
-Manage admin credentials, whitelist connections, and start servers directly:
+## Development checks
 
 ```bash
-# Starts the local cache engine and opens the web dashboard on port 8971
-npx ssdiskdb start
-
-# Start on a custom port and database directory
-npx ssdiskdb start --port 9000 --path ./my-custom-db
-
-# Connect as a remote client using a connection URI (positional)
-npx ssdiskdb start ssdiskdb://ssdb_key@localhost:8971/server-a
-
-# Configure custom Admin Credentials
-npx ssdiskdb credentials --username myuser --password mysecurepass --path ./my-custom-db
-
-# Whitelist a remote client server (Auto-generates key)
-npx ssdiskdb server add server-a --path ./my-custom-db
-
-# List all allowed servers and their API Keys
-npx ssdiskdb server list --path ./my-custom-db
-
-# Remove allowed server access
-npx ssdiskdb server remove server-a --path ./my-custom-db
+npm test
+npm run build
+npm run typecheck
 ```
 
----
+License: Apache-2.0.
 
-## 📋 Production Hardening & Recommendations
+## Package identity and migration
 
-1. **Volume Mount Persistence**: When running on Docker, always mount the persistent storage directory (e.g. `-v /var/lib/ssdb:/data`). LevelDB writes files on-disk; omitting this causes full data loss on container restarts.
-2. **Reverse Proxy & SSL**: Do not expose the HTTP endpoint directly to the public internet. Use a reverse proxy like **Nginx** or **Caddy** to handle SSL termination (HTTPS) and route traffic to local port `8971`.
-3. **Database Locking**: LevelDB is designed for single-process access and places a `LOCK` file in the database directory. If another Node.js process or CLI command attempts to open the same folder simultaneously, it will throw `LEVEL_LOCKED` (NotOpenError). For multi-process access, configure one central server process in Local Mode and connect all other clients in Remote Mode via HTTP connection URIs.
-4. **Client-Side Envelope Encryption**: If deploying on public or untrusted cloud services, connect using the `ssdiskdb+encry://` protocol. Since data is encrypted locally using AES-256-CBC prior to transmission, anyone with physical access to the cloud server's storage disk will only see randomized ciphertext, preventing credential or data leaks.
-5. **LevelDB Backups**: To back up the database, you can safely copy the LevelDB directory while the database is quiet. Do not copy the database directory while high-throughput writes are active, as this may copy a partial state of log/SST files.
+The package in this repository is `@manojgowdain/ssdiskdb@0.1.0`. The unscoped `ssdiskdb` package is a separate existing npm package; this project does not deprecate or modify it. At the time this README was written, the scoped package had not been published to npm or JSR. Install from this repository or its release tarball until publication is announced. No LevelDB migration is required: the storage layout is unchanged by the package rename, and prior data remains readable.
 
----
+The package supports Node.js ESM and CommonJS entrypoints. Deno can type-check and import the source API, and the JSR configuration passes a local dry run. **Local Deno persistence is not verified/supported on Windows:** Deno 2.4.5's Node compatibility runtime could not load `classic-level`'s native addon (Node ABI mismatch). Use Node.js for local LevelDB ownership. Deno can use the gRPC client against a Node-hosted SSDiskDB server; that path should be verified against the specific Deno version and platform before production use.
 
-## 👥 References
+After the scoped release is available, the JSR import form is:
 
-- **Manoj Gowda Portfolio**: [manojgowda.in](https://manojgowda.in)
-- **Google LevelDB**: [github.com/google/leveldb](https://github.com/google/leveldb)
-- **Official SSDB Database (Inspiration)**: [github.com/ideawu/ssdb](https://github.com/ideawu/ssdb)
-- **SSDiskDB Repository**: [github.com/ManojGowda89/ssdiskdb](https://github.com/ManojGowda89/ssdiskdb)
-- **SSDiskDB NPM Package**: [npmjs.com/package/ssdiskdb](https://www.npmjs.com/package/ssdiskdb)
-- **Zerodha Tech Stack**: [zerodha.tech/stack](https://zerodha.tech/stack/)
-- **Zerodha Tech Blog**: [zerodha.tech](https://zerodha.tech)
-- **Docker Hub Repository**: [hub.docker.com/r/manoj20002/ssdiskdb](https://hub.docker.com/r/manoj20002/ssdiskdb)
+```ts
+import { connect } from "jsr:@manojgowdain/ssdiskdb@0.1.0";
+```
 
----
+The code example shows the intended JSR specifier, not a currently published artifact. For local source checking, run `deno check mod.ts`; the parser smoke test requires `deno test --allow-env tests/deno_test.ts` because the imported gRPC dependency reads its logging environment variables.
 
-## 📜 License
+## API availability
 
-Apache-2.0
+| API | Local Node | gRPC client/server | Notes |
+|---|---:|---:|---|
+| String set/get/delete/exists/incr | Yes | Yes | JSON values and Node Buffers |
+| TTL set/expire/ttl/persist | Yes | Yes | Milliseconds; `ttl()` returns `-2`, `-1`, or remaining milliseconds |
+| `mget` / `mset` / `mdelete` / `batch` | Yes | Yes | One remote RPC per bulk call; `batch` handles set/delete |
+| Prefix scan / stream scan | Yes | Yes | Iterator-backed; stream scan is incremental |
+| Hash `hset` / `hget` / `hdel` | Yes | Yes | Field API |
+| Sorted Set `zset` / `zget` / `zdel` | Yes | Yes | No score-range API is currently exposed |
+| Stats / flush | Yes | Yes | Flush and stats are exposed remotely |
+| Dashboard / CLI | Yes | Dashboard routes | Dashboard remains HTTP; CLI name remains `ssdiskdb` |
+| Deno local LevelDB | No on tested Windows/Deno combination | — | Native addon ABI mismatch; see limitation above |
+
+The existing storage representation retains legacy record reads. New records use the versioned envelope described above; package renaming does not rewrite database files. The Hash and Sorted Set implementations retain their existing storage model, and the recorded benchmark currently shows slower local SET/GET than the pre-upgrade baseline. See [`docs/validation-report.md`](docs/validation-report.md) for the commands and measured results from this checkout.

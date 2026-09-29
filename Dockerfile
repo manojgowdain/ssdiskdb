@@ -30,7 +30,7 @@ EXPOSE 8971
 ENV PORT=8971
 ENV PATH_DB=/data
 
-# Persistent leveldb volume
+# Persistent eldb volume
 VOLUME ["/data"]
 
 # Run the SSDiskDB dashboard server

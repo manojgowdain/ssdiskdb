@@ -1,0 +1,10 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npm test *)",
+      "Bash(node -e ' *)",
+      "Bash(node -e \"console.log\\(JSON.stringify\\(require\\('@grpc/proto-loader/package.json'\\).dependencies\\)\\)\")",
+      "Bash(node -e \"const p=require\\('./package.json'\\); console.log\\(JSON.stringify\\(p.dependencies,null,2\\)\\); console.log\\('scripts:', JSON.stringify\\(p.scripts\\)\\)\")"
+    ]
+  }
+}

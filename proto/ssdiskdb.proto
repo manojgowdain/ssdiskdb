@@ -1,0 +1,89 @@
+syntax = "proto3";
+
+package ssdiskdb.v1;
+
+service SSDiskDB {
+  rpc Handshake(HandshakeRequest) returns (HandshakeResponse);
+  rpc Get(GetRequest) returns (GetResponse);
+  rpc Set(SetRequest) returns (MutationResponse);
+  rpc Delete(KeyRequest) returns (MutationResponse);
+  rpc Exists(KeyRequest) returns (ExistsResponse);
+  rpc Incr(IncrRequest) returns (IncrResponse);
+  rpc Expire(ExpireRequest) returns (BoolResponse);
+  rpc TTL(KeyRequest) returns (TTLResponse);
+  rpc Persist(KeyRequest) returns (BoolResponse);
+  rpc MGet(MGetRequest) returns (MGetResponse);
+  rpc MSet(MSetRequest) returns (MutationResponse);
+  rpc MDelete(MDeleteRequest) returns (MutationResponse);
+  rpc Batch(BatchRequest) returns (MutationResponse);
+  rpc HashGet(HashFieldRequest) returns (GetResponse);
+  rpc HashSet(HashSetRequest) returns (MutationResponse);
+  rpc HashDelete(HashFieldRequest) returns (MutationResponse);
+  rpc ZGet(ZMemberRequest) returns (GetResponse);
+  rpc ZSet(ZSetRequest) returns (MutationResponse);
+  rpc ZDelete(ZMemberRequest) returns (MutationResponse);
+  rpc Scan(ScanRequest) returns (ScanResponse);
+  rpc StreamScan(ScanRequest) returns (stream KeyValue);
+  rpc GetAllKeys(Empty) returns (KeyListResponse);
+  rpc Stats(Empty) returns (StatsResponse);
+  rpc Flush(Empty) returns (MutationResponse);
+}
+
+message Empty {}
+
+message Value {
+  enum Encoding {
+    JSON = 0;
+    BYTES = 1;
+  }
+  Encoding encoding = 1;
+  bytes payload = 2;
+}
+
+message HandshakeRequest { string server_id = 1; }
+message HandshakeResponse { bool accepted = 1; string server_id = 2; }
+message KeyRequest { string key = 1; }
+message GetRequest { string key = 1; }
+message GetResponse { bool found = 1; Value value = 2; }
+message SetRequest { string key = 1; Value value = 2; bool has_ttl = 3; double ttl_ms = 4; }
+message MutationResponse { uint32 affected = 1; }
+message ExistsResponse { bool exists = 1; }
+message IncrRequest { string key = 1; double amount = 2; }
+message IncrResponse { double value = 1; }
+message ExpireRequest { string key = 1; double ttl_ms = 2; }
+message BoolResponse { bool value = 1; }
+message TTLResponse { sint64 ttl_ms = 1; }
+message MGetRequest { repeated string keys = 1; }
+message MGetResponse { repeated GetResponse values = 1; }
+message MSetEntry { string key = 1; Value value = 2; bool has_ttl = 3; double ttl_ms = 4; }
+message MSetRequest { repeated MSetEntry entries = 1; }
+message MDeleteRequest { repeated string keys = 1; }
+message BatchOperation {
+  oneof operation {
+    MSetEntry set = 1;
+    string delete_key = 2;
+  }
+}
+message BatchRequest { repeated BatchOperation operations = 1; }
+message HashFieldRequest { string name = 1; string field = 2; }
+message HashSetRequest { string name = 1; string field = 2; Value value = 3; bool has_ttl = 4; double ttl_ms = 5; }
+message ZMemberRequest { string name = 1; string member = 2; }
+message ZSetRequest { string name = 1; string member = 2; double score = 3; bool has_ttl = 4; double ttl_ms = 5; }
+message ScanRequest { string prefix = 1; uint32 limit = 2; string cursor = 3; }
+message KeyValue { string key = 1; Value value = 2; }
+message ScanResponse { string cursor = 1; repeated KeyValue entries = 2; bool has_more = 3; }
+message KeyListResponse { repeated KeyValue entries = 1; }
+message StatsResponse {
+  uint64 reads = 1;
+  uint64 writes = 2;
+  uint64 deletes = 3;
+  uint64 expired_keys = 4;
+  uint64 cache_hits = 5;
+  uint64 cache_misses = 6;
+  uint64 operations_per_second = 7;
+  uint64 active_connections = 8;
+  uint64 bytes_read = 9;
+  uint64 bytes_written = 10;
+  uint64 ttl_cleanup_runs = 11;
+  uint64 ttl_cleanup_keys_deleted = 12;
+}
