@@ -75,6 +75,11 @@ export class GrpcSSDiskDBClient implements SSDiskDBClient {
     this.timeoutMs = options.requestTimeoutMs ?? 5000;
   }
 
+  /** The long-lived gRPC stub reused for every RPC on this client. */
+  get grpcStub(): unknown {
+    return this.client;
+  }
+
   async handshake(): Promise<void> {
     const response = await this.call("handshake", { serverId: this.options.serverId });
     if (!response.accepted) throw new Error("gRPC server rejected the client handshake");

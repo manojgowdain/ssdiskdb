@@ -193,13 +193,16 @@ test("gRPC reuses a channel and serves the shared database API", async (t) => {
   const address = await local.startGrpcServer({ host: "127.0.0.1", port: 0 });
   const remote = await connect(`ssdiskdb+grpc://${apiKey}@${address}/grpc-client`);
   remotes.push(remote);
+  const stub = remote.grpcStub;
   const other = await connect(`ssdiskdb+grpc://other-key@${address}/grpc-other`);
   remotes.push(other);
   const encrypted = await connect(`ssdiskdb+grpc+encry://encrypted-key@${address}/grpc-encrypted?key=client-secret`);
   remotes.push(encrypted);
 
   await remote.set("key", { value: 1 }, { ttl: 5000 });
+  assert.equal(remote.grpcStub, stub);
   assert.deepEqual(await remote.get("key"), { value: 1 });
+  assert.equal(remote.grpcStub, stub);
   assert.equal(await other.get("key"), undefined);
   await other.set("key", "other value");
   assert.deepEqual(await remote.get("key"), { value: 1 });

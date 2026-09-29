@@ -21,6 +21,8 @@ test("npm, Deno, and JSR manifests use the scoped package identity", () => {
   assert.ok(jsr.publish.include.includes("proto/ssdiskdb.proto"));
   assert.equal(pkg.repository.url, "git+https://github.com/manojgowdain/ssdiskdb.git");
   assert.equal(pkg.homepage, "https://manojgowda.in/");
+  assert.match(fs.readFileSync(path.join(root, "readme.md"), "utf8"), /actions\/workflows\/ci\.yml\/badge\.svg/);
+  assert.equal(fs.existsSync(path.join(root, ".github", "workflows", "ci.yml")), true);
   const site = fs.readFileSync(path.join(root, "index.html"), "utf8");
   assert.match(site, /https:\/\/www\.npmjs\.com\/package\/@manojgowdain\/ssdiskdb/);
   assert.match(site, /https:\/\/jsr\.io\/@manojgowdain\/ssdiskdb/);

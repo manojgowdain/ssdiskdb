@@ -1,5 +1,6 @@
 # SSDiskDB
 
+[![CI](https://github.com/manojgowdain/ssdiskdb/actions/workflows/ci.yml/badge.svg)](https://github.com/manojgowdain/ssdiskdb/actions/workflows/ci.yml)
 [GitHub](https://github.com/manojgowdain/ssdiskdb) ·
 [npm](https://www.npmjs.com/package/@manojgowdain/ssdiskdb) ·
 [JSR](https://jsr.io/@manojgowdain/ssdiskdb) ·

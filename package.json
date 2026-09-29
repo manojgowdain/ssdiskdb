@@ -35,8 +35,9 @@
   ],
   "scripts": {
     "build": "tsc && tsc -p tsconfig.cjs.json && node scripts/write-package-markers.cjs",
-    "test": "node test.js && node test-upgrade.js",
+    "test": "node scripts/run-node-tests.cjs",
     "typecheck": "tsc --noEmit",
+    "test:package": "node scripts/test-npm-pack.cjs",
     "benchmark": "npm run build && node benchmark/local.cjs && node benchmark/grpc.cjs && node benchmark/encryption.cjs"
   },
   "keywords": [
