@@ -1,15 +1,15 @@
 # SSDiskDB Package and Runtime Validation
 
-Run date: 2026-09-29. This report records the scoped package and cross-runtime verification performed in this checkout. No package was published.
+Run date: 2026-09-29. This report records the scoped package and cross-runtime verification performed in this checkout. This validation session did not publish packages; the scoped packages appeared in the registries afterward and their current published metadata was checked.
 
 ## Package identity and registry status
 
 - npm manifest and lockfile: `@manojgowdain/ssdiskdb@0.1.0`, `Apache-2.0`.
 - JSR metadata: same name, version, license, and `mod.ts` entrypoint.
 - Existing npm `ssdiskdb@1.1.0` still resolves and is not marked deprecated.
-- `npm view @manojgowdain/ssdiskdb` returned HTTP 404.
-- `https://jsr.io/@manojgowdain/ssdiskdb/meta.json` returned HTTP 404.
-- The scoped install command and JSR import are therefore release targets, not registry installs that are available today.
+- `npm view @manojgowdain/ssdiskdb` now resolves version `0.1.0`, Apache-2.0, and its tarball URL.
+- JSR metadata now resolves `@manojgowdain/ssdiskdb@0.1.0` (created 2026-09-29); `deno check jsr:@manojgowdain/ssdiskdb@0.1.0` passes.
+- The registry package metadata points at the prior `ManojGowda89` GitHub URL; this repository updates its canonical links to the user-provided `manojgowdain` URL.
 - CLI executable remains `ssdiskdb`. Package rename changes no database path, key encoding, or record format.
 
 ## Commands and results

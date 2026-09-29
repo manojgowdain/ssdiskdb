@@ -7,12 +7,12 @@
   "description": "Promise-based SSDB client",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/ManojGowda89/ssdiskdb.git"
+    "url": "git+https://github.com/manojgowdain/ssdiskdb.git"
   },
   "bugs": {
-    "url": "https://github.com/ManojGowda89/ssdiskdb/issues"
+    "url": "https://github.com/manojgowdain/ssdiskdb/issues"
   },
-  "homepage": "https://github.com/ManojGowda89/ssdiskdb#readme",
+  "homepage": "https://manojgowda.in/",
   "main": "./dist/cjs/index.js",
   "module": "./dist/esm/index.js",
   "types": "./dist/esm/index.d.ts",

@@ -453,12 +453,14 @@
       <div class="badge-container">
         <a class="badge" href="https://www.npmjs.com/package/ssdiskdb" target="_blank">Legacy NPM Package: ssdiskdb</a>
         <a class="badge" href="https://github.com/google/leveldb" target="_blank">Google LevelDB Engine</a>
-        <a class="badge" href="https://github.com/ManojGowda89/ssdiskdb" target="_blank">GitHub Repository</a>
+        <a class="badge" href="https://github.com/manojgowdain/ssdiskdb" target="_blank">GitHub Repository</a>
+        <a class="badge" href="https://www.npmjs.com/package/@manojgowdain/ssdiskdb" target="_blank">Scoped npm Package</a>
+        <a class="badge" href="https://jsr.io/@manojgowdain/ssdiskdb" target="_blank">JSR Package</a>
         <a class="badge" href="https://hub.docker.com/r/manoj20002/ssdiskdb" target="_blank">Docker Hub Image</a>
         <a class="badge" href="https://github.com/ideawu/ssdb" target="_blank">Inspired by SSDB</a>
         <a class="badge" href="https://zerodha.tech/stack/" target="_blank">Inspired by Zerodha Stack</a>
-        <a class="badge" href="https://manojgowda.in" target="_blank">Author: Manoj Gowda</a>
-        <a class="badge" href="https://github.com/ManojGowda89/ssdiskdb/blob/main/LICENSE" target="_blank">Apache 2.0 License</a>
+        <a class="badge" href="https://manojgowda.in/" target="_blank">Author: Manoj Gowda</a>
+        <a class="badge" href="https://github.com/manojgowdain/ssdiskdb/blob/main/LICENSE" target="_blank">Apache 2.0 License</a>
       </div>
     </header>
 
@@ -485,13 +487,13 @@
       
       <h3>How the Author Discovered Disk-Backed Caching from Zerodha</h3>
       <p>
-        During research into cost-efficient, high-volume caching architectures, the project's creator, <a href="https://manojgowda.in" target="_blank">Manoj Gowda</a>, came across the public engineering disclosures of <strong>Zerodha</strong>. In their technical stack documentation on <a href="https://zerodha.tech" target="_blank">zerodha.tech</a>, Zerodha's engineering team detailed how they host <strong>SSDB</strong> (an open-source, disk-backed NoSQL database utilizing Google's LevelDB engine) as a key-value cache.
+        During research into cost-efficient, high-volume caching architectures, the project's creator, <a href="https://manojgowda.in/" target="_blank">Manoj Gowda</a>, came across the public engineering disclosures of <strong>Zerodha</strong>. In their technical stack documentation on <a href="https://zerodha.tech" target="_blank">zerodha.tech</a>, Zerodha's engineering team detailed how they host <strong>SSDB</strong> (an open-source, disk-backed NoSQL database utilizing Google's LevelDB engine) as a key-value cache.
       </p>
       <p>
-        In massive production environments, storing billions of keys in memory-only databases like Redis becomes prohibitively expensive due to RAM costs. By reading Zerodha's technical posts, <a href="https://manojgowda.in" target="_blank">Manoj</a> learned how they leveraged SSDB to write records directly to SSDs while keeping a highly optimized memory cache for hot data. This hybrid architecture allowed them to achieve near-Redis latencies at a fraction of the cost, saving massive amounts of RAM and scaling cost-effectively.
+        In massive production environments, storing billions of keys in memory-only databases like Redis becomes prohibitively expensive due to RAM costs. By reading Zerodha's technical posts, <a href="https://manojgowda.in/" target="_blank">Manoj</a> learned how they leveraged SSDB to write records directly to SSDs while keeping a highly optimized memory cache for hot data. This hybrid architecture allowed them to achieve near-Redis latencies at a fraction of the cost, saving massive amounts of RAM and scaling cost-effectively.
       </p>
       <p>
-        This discovery inspired <a href="https://manojgowda.in" target="_blank">Manoj</a> to build <strong>SSDiskDB</strong> from scratch specifically for the JavaScript &amp; Node.js community. Instead of running a separate C++ SSDB daemon process, <strong>SSDiskDB</strong> implements these identical design principles inside an embedded Node.js library—bundling Google's LevelDB storage engine with a Redis-like API, connection pooling, security access whitelisting, and secure remote proxies.
+        This discovery inspired <a href="https://manojgowda.in/" target="_blank">Manoj</a> to build <strong>SSDiskDB</strong> from scratch specifically for the JavaScript &amp; Node.js community. Instead of running a separate C++ SSDB daemon process, <strong>SSDiskDB</strong> implements these identical design principles inside an embedded Node.js library—bundling Google's LevelDB storage engine with a Redis-like API, connection pooling, security access whitelisting, and secure remote proxies.
       </p>
     </section>
 
@@ -558,14 +560,14 @@
       <div class="code-block-wrapper">
         <button class="btn-copy" onclick="copyCode(this)">Copy</button>
         <pre><code>npm install @manojgowdain/ssdiskdb</code></pre>
-      <p>The package is being renamed from <code>ssdiskdb</code>. The old package remains available; the scoped package will be available after its first publication.</p>
+      <p>Install the scoped package <code>@manojgowdain/ssdiskdb</code>. The legacy unscoped package remains available separately.</p>
       </div>
 
       <h3>Method 2: One-Command Shell Installer (macOS & Linux)</h3>
       <p>Automatically verify system requirements, download Node.js (if missing), install the database, and map commands:</p>
       <div class="code-block-wrapper">
         <button class="btn-copy" onclick="copyCode(this)">Copy</button>
-        <pre><code>curl -fsSL https://raw.githubusercontent.com/ManojGowda89/ssdiskdb/main/install.sh | bash</code></pre>
+        <pre><code>curl -fsSL https://raw.githubusercontent.com/manojgowdain/ssdiskdb/main/install.sh | bash</code></pre>
       </div>
 
       <h3>Method 3: Cloud Docker Container</h3>
@@ -737,7 +739,7 @@ await db.zdel("highscores", "alex");</code></pre>
         <li class="ref-item">
           <svg class="ref-icon" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M13.19 8.688a4.5 4.5 0 011.242 7.244l-4.5 4.5a4.5 4.5 0 01-6.364-6.364l1.757-1.757m13.35-.622l1.757-1.757a4.5 4.5 0 00-6.364-6.364l-4.5 4.5a4.5 4.5 0 001.242 7.244" /></svg>
           <div>
-            <a href="https://manojgowda.in" target="_blank">Manoj Gowda Portfolio</a> - Official website of the author of SSDiskDB.
+            <a href="https://manojgowda.in/" target="_blank">Manoj Gowda Portfolio</a> - Official website of the author of SSDiskDB.
           </div>
         </li>
         <li class="ref-item">
@@ -767,8 +769,16 @@ await db.zdel("highscores", "alex");</code></pre>
         <li class="ref-item">
           <svg class="ref-icon" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M13.19 8.688a4.5 4.5 0 011.242 7.244l-4.5 4.5a4.5 4.5 0 01-6.364-6.364l1.757-1.757m13.35-.622l1.757-1.757a4.5 4.5 0 00-6.364-6.364l-4.5 4.5a4.5 4.5 0 001.242 7.244" /></svg>
           <div>
-            <a href="https://github.com/ManojGowda89/ssdiskdb" target="_blank">SSDiskDB GitHub Repository</a> - Direct link to the open-source repository for issues, contributions, and documentation.
+            <a href="https://github.com/manojgowdain/ssdiskdb" target="_blank">SSDiskDB GitHub Repository</a> - Direct link to the open-source repository for issues, contributions, and documentation.
           </div>
+        </li>
+        <li class="ref-item">
+          <svg class="ref-icon" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M13.19 8.688a4.5 4.5 0 011.242 7.244l-4.5 4.5a4.5 4.5 0 00-6.364-6.364l1.757-1.757m13.35-.622l1.757-1.757a4.5 4.5 0 00-6.364-6.364l-4.5 4.5a4.5 4.5 0 001.242 7.244" /></svg>
+          <div><a href="https://www.npmjs.com/package/@manojgowdain/ssdiskdb" target="_blank">SSDiskDB on npm</a> - Scoped Node.js package.</div>
+        </li>
+        <li class="ref-item">
+          <svg class="ref-icon" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M13.19 8.688a4.5 4.5 0 011.242 7.244l-4.5 4.5a4.5 4.5 0 00-6.364-6.364l1.757-1.757m13.35-.622l1.757-1.757a4.5 4.5 0 00-6.364-6.364l-4.5 4.5a4.5 4.5 0 001.242 7.244" /></svg>
+          <div><a href="https://jsr.io/@manojgowdain/ssdiskdb" target="_blank">SSDiskDB on JSR</a> - JSR package and documentation.</div>
         </li>
         <li class="ref-item">
           <svg class="ref-icon" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M13.19 8.688a4.5 4.5 0 011.242 7.244l-4.5 4.5a4.5 4.5 0 01-6.364-6.364l1.757-1.757m13.35-.622l1.757-1.757a4.5 4.5 0 00-6.364-6.364l-4.5 4.5a4.5 4.5 0 001.242 7.244" /></svg>

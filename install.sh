@@ -105,7 +105,7 @@ if command_exists ssdiskdb; then
     echo -e "  ${CYAN}ssdiskdb start --port 9000${NC} - Start on custom port"
     echo -e "  ${CYAN}ssdiskdb credentials${NC}       - Set admin username and password"
     echo -e "  ${CYAN}ssdiskdb server add <id>${NC}   - Register and whitelist a remote client"
-    echo -e "\nDocumentation: ${BLUE}https://github.com/ManojGowda89/ssdiskdb#readme${NC}\n"
+    echo -e "\nDocumentation: ${BLUE}https://github.com/manojgowdain/ssdiskdb#readme${NC}\n"
 else
     echo -e "${RED}Installation finished, but 'ssdiskdb' command could not be resolved.${NC}"
     echo -e "Please verify your global NPM PATH settings or run manually using:"

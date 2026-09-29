@@ -1,12 +1,23 @@
 {
   "version": "5",
   "specifiers": {
+    "jsr:@manojgowdain/ssdiskdb@0.1.0": "0.1.0",
     "npm:@grpc/grpc-js@^1.14.5": "1.14.5",
     "npm:@grpc/proto-loader@~0.8.1": "0.8.1",
     "npm:@types/node@24": "24.13.3",
     "npm:level@10": "10.0.0",
     "npm:typescript@5.9.3": "5.9.3",
     "npm:typescript@^5.9.0": "5.9.3"
+  },
+  "jsr": {
+    "@manojgowdain/ssdiskdb@0.1.0": {
+      "integrity": "88b497fd1cfee21317cb9825a4acc0c005fc7bdd7b62421135db73f154da02b7",
+      "dependencies": [
+        "npm:@grpc/grpc-js",
+        "npm:@grpc/proto-loader",
+        "npm:level"
+      ]
+    }
   },
   "npm": {
     "@grpc/grpc-js@1.14.5": {
