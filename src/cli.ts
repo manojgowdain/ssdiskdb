@@ -2,6 +2,20 @@
 import { connect } from "./index.ts";
 import crypto from "node:crypto";
 import readline from "node:readline";
+import { readFileSync } from "node:fs";
+import { dirname, join } from "node:path";
+
+function getPackageVersion(): string {
+  try {
+    // process.argv[1] is the executing script path in both CommonJS and ESM.
+    const scriptPath = process.argv[1];
+    const here = scriptPath ? dirname(scriptPath) : process.cwd();
+    const pkg = JSON.parse(readFileSync(join(here, "..", "..", "package.json"), "utf8"));
+    return pkg.version || "0.0.0";
+  } catch {
+    return "0.0.0";
+  }
+}
 
 function printHelp() {
   console.log(`
@@ -74,6 +88,11 @@ async function main() {
   const args = process.argv.slice(2);
   const command = args[0];
 
+  if (command === "--version" || command === "-v" || command === "version") {
+    console.log(`ssdiskdb ${getPackageVersion()}`);
+    process.exit(0);
+  }
+
   if (!command || command === "--help" || command === "-h" || command === "help") {
     printHelp();
     process.exit(0);
@@ -88,7 +107,7 @@ async function main() {
     return undefined;
   };
 
-  const dbPath = getFlagValue("--path") || "./ssdb-local-db";
+  const dbPath = getFlagValue("--path") || process.env.SSDISKDB_DATA_DIR || "./ssdb-local-db";
 
   if (command === "start") {
     let connectionUri = getFlagValue("--uri");
@@ -179,7 +198,7 @@ async function main() {
           process.exit(1);
         }
       } else {
-        const portStr = getFlagValue("--port") || "8971";
+        const portStr = getFlagValue("--port") || process.env.SSDISKDB_PORT || "8971";
         const port = parseInt(portStr, 10);
         if (isNaN(port)) {
           console.error("Error: Invalid port specified");
@@ -202,10 +221,33 @@ async function main() {
           }
           const grpcAddress = await client.startGrpcServer({ host: "0.0.0.0", port: grpcPort });
 
+          // Optional environment-based initial credentials: only applied when the
+          // database has never had credentials configured, so restarts never
+          // overwrite an existing admin password.
+          const envUser = process.env.SSDISKDB_USERNAME;
+          const envPass = process.env.SSDISKDB_PASSWORD;
+          if (envUser && envPass) {
+            const existing = await (client as any).getCredentials();
+            const defaultHash = crypto.createHash("sha256").update("manoj").digest("hex");
+            const isDefault = existing.username === "manoj" && existing.passwordHash === defaultHash;
+            if (isDefault) {
+              await (client as any).setCredentials(envUser, crypto.createHash("sha256").update(envPass).digest("hex"));
+              console.log(`Initialized admin credentials from SSDISKDB_USERNAME/SSDISKDB_PASSWORD.`);
+            }
+          }
+
           console.log(`SSDiskDB Local Engine started successfully.`);
-          console.log(`Dashboard is running at: http://localhost:${port}`);
+          console.log(`Dashboard is running at: http://0.0.0.0:${port}`);
           console.log(`gRPC server is listening at: ${grpcAddress}`);
-          console.log(`Default credentials: manoj / manoj (Use credentials command to change)`);
+
+          // Report the actual credential state instead of a hardcoded default.
+          const creds = await (client as any).getCredentials();
+          const isDefault = creds.username === "manoj" && creds.passwordHash === crypto.createHash("sha256").update("manoj").digest("hex");
+          if (isDefault) {
+            console.log(`Default credentials: manoj / manoj (Use 'ssdiskdb credentials' to change)`);
+          } else {
+            console.log(`Credentials configured for user: ${creds.username}`);
+          }
           console.log(`Press Ctrl+C to terminate...`);
 
           // Keep process alive
@@ -259,8 +301,9 @@ async function main() {
       if (typeof (client as any).setCredentials === "function") {
         const passwordHash = crypto.createHash("sha256").update(password).digest("hex");
         await (client as any).setCredentials(username, passwordHash);
-        console.log(`Credentials updated successfully!`);
+        console.log(`Credentials updated successfully.`);
         console.log(`Username set to: ${username}`);
+        console.log(`Password updated. The password is not shown for security.`);
       } else {
         console.error("Error: Client configuration does not support setting credentials.");
       }

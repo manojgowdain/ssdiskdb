@@ -524,10 +524,12 @@
 
       <li class="nav-category">Installation</li>
       <li class="nav-item" id="li-installation"><a href="#installation">Getting Started</a></li>
+      <li class="nav-item" id="li-docker"><a href="#docker">Docker &amp; Compose</a></li>
 
       <li class="nav-category">Configuration</li>
       <li class="nav-item" id="li-connection-options"><a href="#connection-options">Connection Options</a></li>
       <li class="nav-item" id="li-cli"><a href="#cli">CLI Commands</a></li>
+      <li class="nav-item" id="li-configuration"><a href="#configuration">Environment Variables</a></li>
 
       <li class="nav-category">Cloud Console</li>
       <li class="nav-item" id="li-cloud-deployment"><a href="#cloud-deployment">Local-to-Cloud Setup</a></li>
@@ -555,7 +557,7 @@
         <a class="badge" href="https://github.com/manojgowdain/ssdiskdb" target="_blank">GitHub Repository</a>
         <a class="badge" href="https://www.npmjs.com/package/@manojgowdain/ssdiskdb" target="_blank">Scoped npm Package</a>
         <a class="badge" href="https://jsr.io/@manojgowdain/ssdiskdb" target="_blank">JSR Package</a>
-        <a class="badge" href="https://hub.docker.com/r/manoj20002/ssdiskdb" target="_blank">Docker Hub Image</a>
+        <a class="badge" href="https://github.com/manojgowdain/ssdiskdb" target="_blank">Source Code</a>
         <a class="badge" href="https://github.com/ideawu/ssdb" target="_blank">Inspired by SSDB</a>
         <a class="badge" href="https://zerodha.tech/stack/" target="_blank">Inspired by Zerodha Stack</a>
         <a class="badge" href="https://manojgowda.in/" target="_blank">Author: Manoj Gowda</a>
@@ -655,35 +657,46 @@
     <!-- Installation -->
     <section id="installation">
       <h2>Getting Started</h2>
-      <p>You can set up SSDiskDB using three different methods:</p>
+      <p>SSDiskDB can be installed in two official ways:</p>
 
-      <h3>Method 1: NPM Package</h3>
-      <p>Install inside your Node.js application:</p>
+      <h3>Option 1: Native Installation (Linux/macOS)</h3>
+      <p>One-command installer that sets up Node.js (if needed), installs SSDiskDB globally, and makes the <code>ssdiskdb</code> CLI available:</p>
+      <div class="code-block-wrapper">
+        <button class="btn-copy" onclick="copyCode(this)">Copy</button>
+        <pre><code>curl -fsSL https://ssdiskdb.js.org/install.sh | bash</code></pre>
+      </div>
+      <p>After installation:</p>
+      <div class="code-block-wrapper">
+        <button class="btn-copy" onclick="copyCode(this)">Copy</button>
+        <pre><code>ssdiskb start</code></pre>
+      </div>
+      <p>Dashboard: <code>http://localhost:8971</code></p>
+
+      <h3>Option 2: Docker Compose (Cross-platform)</h3>
+      <p>Build the image locally from the GitHub repository—no Docker Hub pull required—and start with persistent storage:</p>
+      <div class="code-block-wrapper">
+        <button class="btn-copy" onclick="copyCode(this)">Copy</button>
+        <pre><code>git clone https://github.com/manojgowdain/ssdiskdb.git
+cd ssdiskdb
+docker compose up -d --build</code></pre>
+      </div>
+      <p>Dashboard: <code>http://localhost:8971</code></p>
+      <p><strong>Note:</strong> SSDiskDB's Docker installation builds the image locally from the GitHub repository. It does not require Docker Hub.</p>
+
+      <h3>Option 3: One-Line Docker Install (Linux/macOS)</h3>
+      <p>If you prefer a single command that sets up the repository and starts Docker Compose:</p>
+      <div class="code-block-wrapper">
+        <button class="btn-copy" onclick="copyCode(this)">Copy</button>
+        <pre><code>curl -fsSL https://ssdiskdb.js.org/docker-install.sh | bash</code></pre>
+      </div>
+
+      <h3>NPM Package (for embedding in your Node.js application)</h3>
+      <p>Install the library to use it programmatically in your own code:</p>
       <div class="code-block-wrapper">
         <button class="btn-copy" onclick="copyCode(this)">Copy</button>
         <pre><code>npm install @manojgowdain/ssdiskdb</code></pre>
-      <p>Install the scoped package <code>@manojgowdain/ssdiskdb</code>. The legacy unscoped package remains available separately.</p>
       </div>
-
-      <h3>Method 2: One-Command Shell Installer (macOS & Linux)</h3>
-      <p>Automatically verify system requirements, download Node.js (if missing), install the database, and map commands:</p>
-      <div class="code-block-wrapper">
-        <button class="btn-copy" onclick="copyCode(this)">Copy</button>
-        <pre><code>curl -fsSL https://raw.githubusercontent.com/manojgowdain/ssdiskdb/main/install.sh | bash</code></pre>
-      </div>
-
-      <!--
-      <h3>Method 3: Cloud Docker Container</h3>
-      <p>Run the container directly using our pre-built image from Docker Hub (configured with volume persistence):</p>
-      <div class="code-block-wrapper">
-        <button class="btn-copy" onclick="copyCode(this)">Copy</button>
-        <pre><code>docker run -d \
-  -p 8971:8971 \
-  -v ssdb-data-volume:/data \
-  --name ssdiskdb-server \
-  manoj20002/ssdiskdb:latest</code></pre>
-      </div>
-      -->
+      <p>Then use <code>npx ssdiskdb start</code> or import it in your code. See <a href="#connection-options">Connection Options</a>.</p>
     </section>
 
     <!-- Connection Options -->
@@ -747,6 +760,62 @@ npx ssdiskdb server list</code></pre>
       </div>
     </section>
 
+    <!-- Configuration -->
+    <section id="configuration">
+      <h2>Environment Variables</h2>
+      <p>The following environment variables can configure SSDiskDB without modifying code:</p>
+
+      <table>
+        <thead>
+          <tr>
+            <th>Variable</th>
+            <th>Description</th>
+            <th>Default</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><code>SSDISKDB_PORT</code></td>
+            <td>Dashboard HTTP port</td>
+            <td><code>8971</code></td>
+          </tr>
+          <tr>
+            <td><code>SSDISKDB_DATA_DIR</code></td>
+            <td>LevelDB database directory path</td>
+            <td><code>./ssdb-local-db</code> (native) / <code>/data/ssdb-local-db</code> (Docker)</td>
+          </tr>
+          <tr>
+            <td><code>SSDISKDB_USERNAME</code></td>
+            <td>Initial admin username (only applied if no credentials exist)</td>
+            <td><em>unset</em></td>
+          </tr>
+          <tr>
+            <td><code>SSDISKDB_PASSWORD</code></td>
+            <td>Initial admin password (only applied if no credentials exist)</td>
+            <td><em>unset</em></td>
+          </tr>
+        </tbody>
+      </table>
+
+      <h3>Native Example</h3>
+      <div class="code-block-wrapper">
+        <button class="btn-copy" onclick="copyCode(this)">Copy</button>
+        <pre><code>SSDISKDB_PORT=9000 SSDISKDB_DATA_DIR=/data/db ssdiskdb start</code></pre>
+      </div>
+
+      <h3>Docker Example</h3>
+      <div class="code-block-wrapper">
+        <button class="btn-copy" onclick="copyCode(this)">Copy</button>
+        <pre><code>docker run -d -p 8971:8971 \
+  -e SSDISKDB_PORT=8971 \
+  -e SSDISKDB_DATA_DIR=/data/ssdb-local-db \
+  -e SSDISKDB_USERNAME=admin \
+  -e SSDISKDB_PASSWORD=secret \
+  -v ./ssdb-local-db:/data/ssdb-local-db \
+  ssdiskdb</code></pre>
+      </div>
+    </section>
+
     <!-- Cloud Console -->
     <section id="cloud-deployment">
       <h2>Cloud Deployment &amp; Local Dashboard Setup</h2>
@@ -759,10 +828,12 @@ npx ssdiskdb server list</code></pre>
       </div>
 
       <h3>Step-by-Step Walkthrough</h3>
-      <p><strong>Step 1: Deploy SSDiskDB on your cloud VPS instance:</strong></p>
+      <p><strong>Step 1: Deploy SSDiskDB on your cloud VPS instance (using Docker Compose):</strong></p>
       <div class="code-block-wrapper">
         <button class="btn-copy" onclick="copyCode(this)">Copy</button>
-        <pre><code>docker run -d -p 8971:8971 -v /var/lib/ssdb:/data --name ssdb manoj20002/ssdiskdb:latest</code></pre>
+        <pre><code>git clone https://github.com/manojgowdain/ssdiskdb.git
+cd ssdiskdb
+docker compose up -d --build</code></pre>
       </div>
 
       <p><strong>Step 2: Register a console profile on the cloud instance:</strong></p>
@@ -1028,7 +1099,7 @@ await db.zdel("highscores", "alex");</code></pre>
         <li class="ref-item">
           <svg class="ref-icon" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M13.19 8.688a4.5 4.5 0 011.242 7.244l-4.5 4.5a4.5 4.5 0 01-6.364-6.364l1.757-1.757m13.35-.622l1.757-1.757a4.5 4.5 0 00-6.364-6.364l-4.5 4.5a4.5 4.5 0 001.242 7.244" /></svg>
           <div>
-            <a href="https://hub.docker.com/r/manoj20002/ssdiskdb" target="_blank">SSDiskDB Docker Hub Image</a> - Official pre-built Docker container image ready for cloud and container deployments.
+            <a href="https://github.com/manojgowdain/ssdiskdb" target="_blank">Source Code</a> - Build the Docker image locally from the GitHub repository.
           </div>
         </li>
       </ul>

@@ -54,6 +54,39 @@ npm install @manojgowdain/ssdiskdb
 The package provides TypeScript declarations and both ESM and CommonJS
 entrypoints.
 
+### Option 1 — Native
+
+```bash
+curl -fsSL https://ssdiskdb.js.org/install.sh | bash
+```
+
+Then:
+
+```bash
+ssdiskdb start
+```
+
+Dashboard: <code>http://localhost:8971</code>
+
+### Option 2 — Docker Compose
+
+```bash
+git clone https://github.com/manojgowdain/ssdiskdb.git
+cd ssdiskdb
+docker compose up -d --build
+```
+
+Dashboard: <code>http://localhost:8971</code>
+
+> SSDiskDB's Docker installation builds the image locally from the GitHub
+> repository. It does not require Docker Hub.
+
+### One-line Docker Install
+
+```bash
+curl -fsSL https://ssdiskdb.js.org/docker-install.sh | bash
+```
+
 ```ts
 import { connect } from "@manojgowdain/ssdiskdb";
 ```

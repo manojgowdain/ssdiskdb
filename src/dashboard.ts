@@ -2483,6 +2483,14 @@ export function startDashboardServer(
         return;
       }
 
+      // Health check endpoint (used by Docker HEALTHCHECK and load balancers).
+      // Bypasses authentication: it only reports whether the server is alive.
+      if (url === "/health" && method === "GET") {
+        res.writeHead(200, { "Content-Type": "application/json" });
+        res.end(JSON.stringify({ status: "ok", service: "ssdiskdb" }));
+        return;
+      }
+
       // API: Logout
       if (url === "/api/logout") {
         const cookies = parseCookies(req.headers.cookie);

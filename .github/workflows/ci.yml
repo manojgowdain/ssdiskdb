@@ -1,0 +1,140 @@
+name: SSDiskDB CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  native:
+    name: Native Installation Verification
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Node setup
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install
+        run: npm ci
+
+      - name: Build
+        run: npm run build
+
+      - name: Verify CLI --version
+        run: npx ssdiskdb --version
+
+      - name: Test CLI start (headless)
+        run: |
+          set -e
+          npx ssdiskdb start &
+          PID=$!
+          # Wait for dashboard to be reachable
+          for i in $(seq 1 30); do
+            if curl -fsS http://127.0.0.1:8971/health >/dev/null 2>&1; then
+              echo "Dashboard is up"
+              break
+            fi
+            sleep 1
+          done
+          # Test credentials CLI
+          npx ssdiskdb credentials --username testuser --password testpass
+          kill $PID 2>/dev/null || true
+          wait $PID 2>/dev/null || true
+
+      - name: Pack
+        run: npm pack --dry-run
+
+  docker:
+    name: Docker Compose Verification
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    services:
+      ssdiskdb:
+        image: node:20-alpine
+        ports:
+          - 8971:8971
+        volumes:
+          - ./ssdb-local-db:/data/ssdb-local-db
+        env:
+          SSDISKDB_PORT: 8971
+          SSDISKDB_DATA_DIR: /data/ssdb-local-db
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Node setup
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install
+        run: npm ci
+
+      - name: Docker Compose install
+        run: |
+          # Ensure docker-compose is available
+          if ! command -v docker-compose &>/dev/null; then
+            sudo apt-get update -y
+            sudo apt-get install -y docker-compose
+          fi
+
+      - name: Build and start Docker Compose
+        run: |
+          docker compose build --no-cache
+          docker compose up -d --build
+
+      - name: Wait for health
+        run: |
+          for i in $(seq 1 30); do
+            if curl -fsS http://127.0.0.1:8971/health >/dev/null 2>&1; then
+              echo "Dashboard is healthy"
+              break
+            fi
+            sleep 2
+          done
+
+      - name: Write test data
+        run: |
+          # Write test key via HTTP API
+          KEY='test_persistence_key'
+          VALUE='test_value'
+          curl -fsS -X POST http://127.0.0.1:8971/api/keys \
+            -H "Content-Type: application/json" \
+            -d "{\"type\":\"string\",\"key\":\"${KEY}\",\"value\":${VALUE}}" >/dev/null
+
+      - name: Verify data read
+        run: |
+          curl -fsS http://127.0.0.1:8971/api/keys | jq -e '.[] | select(.key | test("test_persistence_key"))'
+
+      - name: Restart container
+        run: docker compose restart
+
+      - name: Verify data after restart
+        run: |
+          curl -fsS http://127.0.0.1:8971/api/keys | jq -e '.[] | select(.key | test("test_persistence_key"))'
+
+      - name: Stop and start containers
+        run: |
+          docker compose down
+          docker compose up -d --build
+
+      - name: Verify data after down/up
+        run: |
+          curl -fsS http://127.0.0.1:8971/api/keys | jq -e '.[] | select(.key | test("test_persistence_key"))'
+
+      - name: Stop and remove volumes
+        run: |
+          docker compose down -v
+
+      - name: Cleanup
+        run: |
+          rm -rf ./ssdb-local-db
+
+      - name: Pack test
+        run: npm run test:package

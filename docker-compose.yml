@@ -1,0 +1,35 @@
+# SSDiskDB — Docker Compose
+#
+# The image is built locally from this repository. SSDiskDB is NOT pulled from
+# Docker Hub. Only the generic Node.js base image comes from a registry.
+#
+# Start:     docker compose up -d
+# Rebuild:   docker compose up -d --build
+# Stop:      docker compose stop
+# Restart:   docker compose restart
+# Logs:      docker compose logs -f
+# Status:    docker compose ps
+# Remove:    docker compose down
+#
+# Data persistence: ./ssdb-local-db on the host is bind-mounted into the
+# container at /data/ssdb-local-db. Do NOT delete ./ssdb-local-db if you want
+# to keep your database across restarts and down/up cycles.
+
+services:
+  ssdiskdb:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8971:8971"
+    environment:
+      SSDISKDB_PORT: "8971"
+      SSDISKDB_DATA_DIR: /data/ssdb-local-db
+      # Optional initial admin credentials. They are only applied once, when the
+      # database has never had credentials configured. Existing credentials are
+      # never overwritten on restart.
+      # SSDISKDB_USERNAME: admin
+      # SSDISKDB_PASSWORD: change-me
+    volumes:
+      - ./ssdb-local-db:/data/ssdb-local-db
+    restart: unless-stopped
