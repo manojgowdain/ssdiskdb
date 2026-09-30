@@ -3,7 +3,107 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>SSDiskDB - High-Performance Disk-Backed NoSQL Database</title>
+  <title>SSDiskDB - Persistent Disk Database for Node.js</title>
+  <meta name="description" content="SSDiskDB is a lightweight persistent disk-based database for Node.js with fast local storage, key-value operations, TTL, and developer-friendly APIs.">
+  <meta name="robots" content="index, follow">
+  <link rel="canonical" href="https://ssdiskdb.js.org/">
+  <meta name="google-site-verification" content="EUYBWEqpv0cLfawOccM6itH9lGC4nYmBsiuiHn69pTU" />
+  <meta name="author" content="Manoj Gowda">
+
+  <!-- Open Graph -->
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="SSDiskDB">
+  <meta property="og:title" content="SSDiskDB - Persistent Disk Database for Node.js">
+  <meta property="og:description" content="SSDiskDB is a lightweight persistent disk-based database for Node.js with fast local storage, key-value operations, TTL, and developer-friendly APIs.">
+  <meta property="og:url" content="https://ssdiskdb.js.org/">
+  <meta property="og:image" content="https://ssdiskdb.js.org/images/og-image.png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:alt" content="SSDiskDB - Persistent Disk Database for Node.js">
+  <meta property="og:locale" content="en_US">
+  <meta property="og:fb:app_id" content="1880501465612304">
+
+  <!-- Twitter -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:site" content="@ssdiskdb">
+  <meta name="twitter:creator" content="@manojgowda89">
+  <meta name="twitter:title" content="SSDiskDB - Persistent Disk Database for Node.js">
+  <meta name="twitter:description" content="SSDiskDB is a lightweight persistent disk-based database for Node.js with fast local storage, key-value operations, TTL, and developer-friendly APIs.">
+  <meta name="twitter:image" content="https://ssdiskdb.js.org/images/og-image.png">
+  <meta name="twitter:image:alt" content="SSDiskDB - Persistent Disk Database for Node.js">
+
+  <!-- DNS prefetch / preconnect -->
+  <link rel="dns-prefetch" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+  <!-- Favicon -->
+  <link rel="icon" type="image/x-icon" href="/images/favicon.ico">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png">
+  <link rel="manifest" href="/images/site.webmanifest">
+
+  <!-- Structured data: SoftwareApplication -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "SoftwareApplication",
+    "name": "SSDiskDB",
+    "alternateName": "SSDiskDB",
+    "description": "SSDiskDB is a lightweight persistent disk-based database for Node.js with fast local storage, key-value operations, TTL, and developer-friendly APIs.",
+    "url": "https://ssdiskdb.js.org/",
+    "applicationCategory": "DeveloperApplication",
+    "operatingSystem": "Node.js; cross-platform",
+    "license": "https://www.apache.org/licenses/LICENSE-2.0",
+    "codeRepository": "https://github.com/manojgowdain/ssdiskdb",
+    "offers": {
+      "@type": "Offer",
+      "price": "0",
+      "priceCurrency": "USD"
+    },
+    "author": {
+      "@type": "Person",
+      "name": "Manoj Gowda",
+      "url": "https://manojgowda.in/"
+    },
+    "publisher": {
+      "@type": "Organization",
+      "name": "SSDiskDB",
+      "url": "https://ssdiskdb.js.org/"
+    },
+    "aggregateRating": {
+      "@type": "AggregateRating",
+      "ratingCount": "0",
+      "bestRating": "5",
+      "worstRating": "1"
+    }
+  }
+  </script>
+
+  <!-- Structured data: WebSite -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    "name": "SSDiskDB",
+    "url": "https://ssdiskdb.js.org/",
+    "description": "SSDiskDB is a lightweight persistent disk-based database for Node.js with fast local storage, key-value operations, TTL, and developer-friendly APIs.",
+    "publisher": {
+      "@type": "Organization",
+      "name": "SSDiskDB",
+      "logo": {
+        "@type": "ImageObject",
+        "url": "https://ssdiskdb.js.org/images/og-image.png"
+      }
+    },
+    "sameAs": [
+      "https://github.com/manojgowdain/ssdiskdb",
+      "https://www.npmjs.com/package/@manojgowdain/ssdiskdb",
+      "https://jsr.io/@manojgowdain/ssdiskdb"
+    ]
+  }
+  </script>
+
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
   <style>
     :root {
@@ -412,9 +512,7 @@
 
   <aside id="sidebar">
     <div class="logo-container">
-      <svg viewBox="0 0 24 24">
-        <path stroke-linecap="round" stroke-linejoin="round" d="M20.25 6.375c0 2.278-3.694 4.125-8.25 4.125S3.75 8.653 3.75 6.375m16.5 0c0-2.278-3.694-4.125-8.25-4.125S3.75 4.097 3.75 6.375m16.5 0v11.25c0 2.278-3.694 4.125-8.25 4.125s-8.25-1.847-8.25-4.125V6.375m16.5 0v3.75m-16.5-3.75v3.75m16.5 0v3.75C20.25 16.153 16.556 18 12 18s-8.25-1.847-8.25-4.125v-3.75m16.5 0v3.75" />
-      </svg>
+      <img src="/images/logowithoutbg.png" alt="SSDiskDB logo" width="40" height="40" loading="eager">
       <div class="logo-title">SSDiskDB</div>
     </div>
 
@@ -436,6 +534,7 @@
 
       <li class="nav-category">Methods</li>
       <li class="nav-item" id="li-methods"><a href="#methods">Available APIs</a></li>
+      <li class="nav-item" id="li-ttl"><a href="#ttl">TTL / Expiration</a></li>
 
       <li class="nav-category">Production</li>
       <li class="nav-item" id="li-production"><a href="#production">Best Practices</a></li>
@@ -447,9 +546,9 @@
 
   <main>
     <header>
-      <h1>SSDiskDB Documentation</h1>
-      <p>A high-performance, <strong>open-source</strong>, embedded NoSQL database and key-value store <strong>built specifically for the JavaScript &amp; Node.js community</strong>, powered by Google's LevelDB.</p>
-      
+      <h1>SSDiskDB - Persistent Disk Database for Node.js</h1>
+      <p>SSDiskDB is a lightweight, <strong>open-source</strong>, persistent disk-based database for Node.js. It provides fast local key-value storage, TTL expiration, Hash and Sorted Set APIs, and developer-friendly connections — built on Google's LevelDB.</p>
+
       <div class="badge-container">
         <a class="badge" href="https://www.npmjs.com/package/ssdiskdb" target="_blank">Legacy NPM Package: ssdiskdb</a>
         <a class="badge" href="https://github.com/google/leveldb" target="_blank">Google LevelDB Engine</a>
@@ -466,12 +565,15 @@
 
     <!-- Introduction -->
     <section id="introduction">
-      <h2>Introduction</h2>
+      <h2>What is SSDiskDB?</h2>
       <p>
-        <strong>SSDiskDB</strong> is an <strong>open-source</strong>, embedded NoSQL caching layer and database engine <strong>built from scratch for the JavaScript &amp; Node.js community</strong> as a disk-backed alternative to Redis. In large-scale production environments, caching billions of records in memory becomes extremely expensive due to RAM pricing constraints.
+        <strong>SSDiskDB</strong> is an <strong>open-source</strong>, persistent disk-based database for Node.js. It is a lightweight, embedded key-value store built from scratch for the JavaScript community as a disk-backed alternative to in-memory caches like Redis. In large-scale production environments, caching billions of records in memory becomes extremely expensive due to RAM pricing constraints.
       </p>
       <p>
-        By utilizing **Google's LevelDB** storage library, SSDiskDB stores data directly on disk (SSDs or persistent volumes) while maintaining an internal cache for fast read access, enabling near-memory speeds for hot keys while saving up to 90% of database infrastructure costs.
+        By utilizing <strong>Google's LevelDB</strong> storage library, SSDiskDB stores data directly on disk (SSDs or persistent volumes) while maintaining an internal cache for fast read access, enabling near-memory speeds for hot keys while saving database infrastructure costs.
+      </p>
+      <p>
+        SSDiskDB is a <strong>local Node.js database</strong> that runs in-process — it does not require installing an external SSDB server process on your machine. It provides a Redis-like API with String, Hash, and Sorted Set data structures, optional client-side encryption, and persistent storage that survives process restarts.
       </p>
       <div class="alert alert-note">
         <strong>💡 Note:</strong> This is a standalone, lightweight library. It does not require installing an external SSDB server process on your machine.
@@ -570,6 +672,7 @@
         <pre><code>curl -fsSL https://raw.githubusercontent.com/manojgowdain/ssdiskdb/main/install.sh | bash</code></pre>
       </div>
 
+      <!--
       <h3>Method 3: Cloud Docker Container</h3>
       <p>Run the container directly using our pre-built image from Docker Hub (configured with volume persistence):</p>
       <div class="code-block-wrapper">
@@ -580,6 +683,7 @@
   --name ssdiskdb-server \
   manoj20002/ssdiskdb:latest</code></pre>
       </div>
+      -->
     </section>
 
     <!-- Connection Options -->
@@ -711,6 +815,141 @@ await db.hdel("user:100", "role");</code></pre>
         <pre><code>await db.zset("highscores", "alex", 99.5);
 await db.zget("highscores", "alex"); // Returns 99.5
 await db.zdel("highscores", "alex");</code></pre>
+      </div>
+    </section>
+
+    <!-- TTL / Expiration -->
+    <section id="ttl">
+      <h2>TTL / Expiration</h2>
+      <p>
+        TTL (Time-To-Live) controls how long a key is available before SSDiskDB
+        removes it automatically. TTL is expressed in <strong>milliseconds</strong>
+        and is passed as the <code>ttl</code> option to <code>db.set()</code>
+        (and to <code>hset</code>, <code>zset</code>, <code>mset</code>, and
+        <code>batch</code>).
+      </p>
+
+      <div class="code-block-wrapper">
+        <button class="btn-copy" onclick="copyCode(this)">Copy</button>
+        <pre><code>const { connect } = require("@manojgowdain/ssdiskdb");
+
+(async () => {
+  const db = await connect();
+
+  // `ttl` is an option to db.set(). It is specified in milliseconds.
+  // `5 * 1000` means 5 seconds.
+  await db.set("welcome_message", "Hello World!", {
+    ttl: 5 * 1000
+  });
+
+  console.log(await db.get("welcome_message")); // "Hello World!" (while alive)
+
+  await db.close();
+})();</code></pre>
+      </div>
+
+      <h3>How expiration works</h3>
+      <ul>
+        <li>The absolute expiration timestamp (<code>Date.now() + ttl</code>) is stored together with the record, so a read can decide from its own primary lookup whether the key has expired.</li>
+        <li><strong>TTL is optional.</strong> If <code>ttl</code> is not provided, the key follows the normal default persistence behavior of SSDiskDB: it stays available until deleted.</li>
+        <li><strong>Reading an expired key</strong> returns <code>undefined</code> from <code>get()</code>, <code>false</code> from <code>exists()</code>, and <code>-2</code> from <code>ttl()</code>. The expired record is removed on the read path (lazy expiration).</li>
+        <li><strong>Expiration is handled automatically.</strong> A single background worker walks the ordered <code>ttl/&lt;19-digit-expiresAt&gt;/&lt;fullDataKey&gt;</code> index in bounded batches and deletes records whose expiration has passed. It uses no per-key timers, runs at a fixed interval, and stops during <code>close()</code>. Expired records are also removed lazily by reads, so a key is never returned after its TTL expires.</li>
+        <li>TTL data survives process restarts: the expiration timestamp and the cleanup index are persisted on disk.</li>
+      </ul>
+
+      <h3>TTL examples</h3>
+      <div class="code-block-wrapper">
+        <button class="btn-copy" onclick="copyCode(this)">Copy</button>
+        <pre><code>const { connect } = require("@manojgowdain/ssdiskdb");
+
+(async () => {
+  const db = await connect();
+
+  // 5 seconds
+  await db.set("temp:5s", "value", { ttl: 5 * 1000 });
+
+  // 1 minute
+  await db.set("session", { userId: 123, authenticated: true }, { ttl: 60 * 1000 });
+
+  // 1 hour
+  await db.set("token", "abc123", { ttl: 60 * 60 * 1000 });
+
+  // No TTL: persistent until deleted
+  await db.set("config", { theme: "dark" });
+
+  console.log(await db.get("session")); // { userId: 123, authenticated: true }
+
+  // After 60 seconds the key has expired:
+  console.log(await db.get("session")); // undefined
+
+  await db.close();
+})();</code></pre>
+      </div>
+
+      <h3>Checking a key before and after expiration</h3>
+      <div class="code-block-wrapper">
+        <button class="btn-copy" onclick="copyCode(this)">Copy</button>
+        <pre><code>const { connect } = require("@manojgowdain/ssdiskdb");
+
+(async () => {
+  const db = await connect();
+
+  await db.set("short", "value", { ttl: 2 * 1000 }); // 2 seconds
+
+  console.log(await db.get("short"));   // "value"
+  console.log(await db.exists("short")); // true
+  console.log(await db.ttl("short"));    // &gt;= 0 (remaining milliseconds)
+
+  // Wait past the TTL...
+  await new Promise((resolve) =&gt; setTimeout(resolve, 2500));
+
+  console.log(await db.get("short"));    // undefined
+  console.log(await db.exists("short")); // false
+  console.log(await db.ttl("short"));    // -2 (absent or expired)
+
+  await db.close();
+})();</code></pre>
+      </div>
+
+      <h3>TTL reference table</h3>
+      <table>
+        <thead>
+          <tr>
+            <th>Example</th>
+            <th style="text-align:right">TTL (milliseconds)</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td>5 seconds</td><td style="text-align:right"><code>5 * 1000</code></td></tr>
+          <tr><td>1 minute</td><td style="text-align:right"><code>60 * 1000</code></td></tr>
+          <tr><td>1 hour</td><td style="text-align:right"><code>60 * 60 * 1000</code></td></tr>
+          <tr><td>1 day</td><td style="text-align:right"><code>24 * 60 * 60 * 1000</code></td></tr>
+        </tbody>
+      </table>
+
+      <h3>TTL semantics</h3>
+      <ul>
+        <li><code>ttl(key) === -2</code>: key is absent or expired.</li>
+        <li><code>ttl(key) === -1</code>: key exists without expiration.</li>
+        <li><code>ttl(key) &gt;= 0</code>: remaining TTL in milliseconds.</li>
+        <li><code>ttl: 0</code>: immediately expired; the key is not readable.</li>
+        <li>Negative or non-finite values throw a <code>RangeError</code>.</li>
+        <li>Replacing a record without a TTL removes its previous expiration.</li>
+        <li>Old records without TTL metadata remain persistent and readable.</li>
+        <li><code>set</code>, <code>hset</code>, and <code>zset</code> accept per-record <code>{ ttl }</code>.</li>
+        <li><code>expire(key, ttlMs)</code> sets or replaces a String key's TTL; <code>persist(key)</code> removes it. Hash fields and Sorted Set members receive TTL only through their <code>hset</code>/<code>zset</code> options and have no separate public TTL query method.</li>
+      </ul>
+
+      <h3>Configure cleanup on open</h3>
+      <div class="code-block-wrapper">
+        <button class="btn-copy" onclick="copyCode(this)">Copy</button>
+        <pre><code>const db = await connect({
+  storagePath: "./data",
+  ttl: {
+    cleanupInterval: 1_000, // milliseconds between cleanup passes
+    cleanupBatchSize: 500, // maximum index rows processed per pass
+  },
+});</code></pre>
       </div>
     </section>
 

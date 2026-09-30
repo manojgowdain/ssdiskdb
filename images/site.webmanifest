@@ -1,0 +1,24 @@
+{
+  "name": "SSDiskDB",
+  "short_name": "SSDiskDB",
+  "description": "SSDiskDB is a lightweight persistent disk-based database for Node.js with fast local storage, key-value operations, TTL, and developer-friendly APIs.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#ffffff",
+  "dir": "ltr",
+  "lang": "en",
+  "icons": [
+    {
+      "src": "/images/android-chrome-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "/images/android-chrome-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}

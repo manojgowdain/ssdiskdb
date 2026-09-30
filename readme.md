@@ -28,7 +28,7 @@ expanded guide after a new package release.
 - [Quick start](#quick-start)
 - [Connect options](#connect-options)
 - [API reference](#api-reference)
-- [TTL and expiration](#ttl-and-expiration)
+- [TTL / Expiration](#ttl--expiration)
 - [Bulk operations and scans](#bulk-operations-and-scans)
 - [Hash and Sorted Set operations](#hash-and-sorted-set-operations)
 - [gRPC server and client](#grpc-server-and-client)
@@ -234,36 +234,124 @@ URI schemes into connection options. `DatabaseCore` is the shared storage core
 used by local clients and the gRPC server; most applications should use
 `connect()` instead of constructing the core directly.
 
-## TTL and expiration
+## TTL / Expiration
 
-TTL is expressed in milliseconds and stored in the primary record. The absolute
-expiration timestamp is encoded with the record, so `get()` can decide whether
-it has expired from its primary read. A separate ordered index supports cleanup.
+TTL (Time-To-Live) controls how long a key is available before SSDiskDB removes
+it automatically. TTL is expressed in **milliseconds** and is passed as the
+`ttl` option to `db.set()` (and to `hset`, `zset`, `mset`, and `batch`).
 
 ```ts
-await db.set("session:123", { userId: 123, authenticated: true }, {
-  ttl: 60_000,
-});
-console.log(await db.ttl("session:123"));
+const { connect } = require("@manojgowdain/ssdiskdb");
 
-await db.expire("session:123", 30_000); // replace TTL
-await db.persist("session:123"); // remove TTL
+(async () => {
+  const db = await connect();
+
+  // `ttl` is an option to db.set(). It is specified in milliseconds.
+  // `5 * 1000` means 5 seconds.
+  await db.set("welcome_message", "Hello World!", {
+    ttl: 5 * 1000
+  });
+
+  console.log(await db.get("welcome_message")); // "Hello World!" (while alive)
+
+  await db.close();
+})();
 ```
 
-Semantics:
+### How expiration works
+
+- The absolute expiration timestamp (`Date.now() + ttl`) is stored together with
+  the record, so a read can decide from its own primary lookup whether the key
+  has expired.
+- **TTL is optional.** If `ttl` is not provided, the key follows the normal
+  default persistence behavior of SSDiskDB: it stays available until deleted.
+- **Reading an expired key** returns `undefined` from `get()`, `false` from
+  `exists()`, and `-2` from `ttl()`. The expired record is removed on the read
+  path (lazy expiration).
+- **Expiration is handled automatically.** A single background worker walks the
+  ordered `ttl/<19-digit-expiresAt>/<fullDataKey>` index in bounded batches and
+  deletes records whose expiration has passed. It uses no per-key timers, runs
+  at a fixed interval, and stops during `close()`. Expired records are also
+  removed lazily by reads, so a key is never returned after its TTL expires.
+- TTL data survives process restarts: the expiration timestamp and the cleanup
+  index are persisted on disk.
+
+### TTL examples
+
+```ts
+const { connect } = require("@manojgowdain/ssdiskdb");
+
+(async () => {
+  const db = await connect();
+
+  // 5 seconds
+  await db.set("temp:5s", "value", { ttl: 5 * 1000 });
+
+  // 1 minute
+  await db.set("session", { userId: 123, authenticated: true }, { ttl: 60 * 1000 });
+
+  // 1 hour
+  await db.set("token", "abc123", { ttl: 60 * 60 * 1000 });
+
+  // No TTL: persistent until deleted
+  await db.set("config", { theme: "dark" });
+
+  console.log(await db.get("session")); // { userId: 123, authenticated: true }
+
+  // After 60 seconds the key has expired:
+  console.log(await db.get("session")); // undefined
+
+  await db.close();
+})();
+```
+
+### Checking a key before and after expiration
+
+```ts
+const { connect } = require("@manojgowdain/ssdiskdb");
+
+(async () => {
+  const db = await connect();
+
+  await db.set("short", "value", { ttl: 2 * 1000 }); // 2 seconds
+
+  console.log(await db.get("short"));   // "value"
+  console.log(await db.exists("short")); // true
+  console.log(await db.ttl("short"));    // >= 0 (remaining milliseconds)
+
+  // Wait past the TTL...
+  await new Promise((resolve) => setTimeout(resolve, 2500));
+
+  console.log(await db.get("short"));    // undefined
+  console.log(await db.exists("short")); // false
+  console.log(await db.ttl("short"));    // -2 (absent or expired)
+
+  await db.close();
+})();
+```
+
+### TTL reference table
+
+| Example       | TTL (milliseconds)     |
+| ------------- | ---------------------- |
+| 5 seconds     | `5 * 1000`             |
+| 1 minute      | `60 * 1000`            |
+| 1 hour        | `60 * 60 * 1000`       |
+| 1 day         | `24 * 60 * 60 * 1000`  |
+
+### TTL semantics
 
 - `ttl(key) === -2`: key is absent or expired.
 - `ttl(key) === -1`: key exists without expiration.
 - `ttl(key) >= 0`: remaining TTL in milliseconds.
-- `ttl: 0`: immediately expired.
+- `ttl: 0`: immediately expired; the key is not readable.
 - Negative or non-finite values throw a `RangeError`.
 - Replacing a record without a TTL removes its previous expiration.
 - Old records without TTL metadata remain persistent and readable.
 - `set`, `hset`, and `zset` accept per-record `{ ttl }`.
-- TTL data survives process restarts. Reads lazily remove expired records, and
-  one background worker walks the ordered
-  `ttl/<19-digit-expiresAt>/<fullDataKey>` index in bounded batches. It uses no
-  per-key timers and stops during `close()`.
+- `expire(key, ttlMs)` sets or replaces a String key's TTL; `persist(key)`
+  removes it. Hash fields and Sorted Set members receive TTL only through their
+  `hset`/`zset` options and have no separate public TTL query method.
 
 Configure cleanup on open:
 
@@ -774,6 +862,11 @@ Initialization is excluded from measured request latency; warm-up, sample count,
 OS/CPU, memory deltas, and percentiles should be included when comparing runs.
 Do not compare measurements from different machines as a controlled before/after
 result.
+
+## Documentation
+
+- [Documentation website](https://ssdiskdb.js.org/) — full reference, guides, and examples.
+- [AI Agent Documentation](https://ssdiskdb.js.org/aiagents) — self-contained reference for code-generation agents.
 
 ## Links and license
 
