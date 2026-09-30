@@ -37,8 +37,6 @@ COPY --from=builder /app/package*.json ./
 COPY --from=builder /app/node_modules ./node_modules
 COPY --from=builder /app/dist ./dist
 COPY --from=builder /app/proto ./proto
-COPY --from=builder /app/README.md ./README.md
-COPY --from=builder /app/LICENSE ./LICENSE
 
 # Persistent database directory. The compose file bind-mounts the host path
 # here, so data survives container restarts and recreations.
