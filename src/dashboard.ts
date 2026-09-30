@@ -2267,8 +2267,8 @@ export function startDashboardServer(
       const url = req.url || "/";
       const method = req.method || "GET";
 
-      // 1. Check if it's a remote client API request
-      const isClientApi = ["/api/handshake", "/api/heartbeat", "/api/rpc"].includes(url);
+      // 1. Check if it's a remote client API request or a public health check
+      const isClientApi = ["/api/handshake", "/api/heartbeat", "/api/rpc", "/health"].includes(url);
 
       let authenticated = false;
       let userRole = "";
